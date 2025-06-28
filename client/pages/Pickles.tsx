@@ -12,6 +12,13 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Pickles() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,15 +29,16 @@ export default function Pickles() {
       id: 1,
       name: "Grandma's Mango Pickle",
       category: "Mango",
-      price: "₹249",
-      originalPrice: "₹299",
+      price6oz: "$12.99",
+      price8oz: "$16.99",
+      originalPrice6oz: "$14.99",
+      originalPrice8oz: "$18.99",
       image: "/placeholder.svg",
       rating: 4.8,
       reviews: 124,
       description:
         "Traditional raw mango pickle with mustard oil and authentic spices",
       spiceLevel: "Medium",
-      weight: "500g",
       badge: "Best Seller",
       ingredients: [
         "Raw Mango",
@@ -44,14 +52,15 @@ export default function Pickles() {
       id: 2,
       name: "Spicy Red Chili Pickle",
       category: "Chili",
-      price: "₹199",
-      originalPrice: "₹249",
+      price6oz: "$10.99",
+      price8oz: "$14.99",
+      originalPrice6oz: "$12.99",
+      originalPrice8oz: "$16.99",
       image: "/placeholder.svg",
       rating: 4.7,
       reviews: 156,
       description: "Fiery red chili pickle for spice lovers",
       spiceLevel: "Hot",
-      weight: "400g",
       badge: "Hot",
       ingredients: ["Red Chili", "Sesame Oil", "Garlic", "Salt", "Hing"],
     },
@@ -59,14 +68,15 @@ export default function Pickles() {
       id: 3,
       name: "Sweet Lime Pickle",
       category: "Citrus",
-      price: "₹189",
-      originalPrice: "₹229",
+      price6oz: "$9.99",
+      price8oz: "$13.99",
+      originalPrice6oz: "$11.99",
+      originalPrice8oz: "$15.99",
       image: "/placeholder.svg",
       rating: 4.6,
       reviews: 89,
       description: "Tangy and sweet lime pickle with jaggery",
       spiceLevel: "Mild",
-      weight: "350g",
       badge: "Sweet",
       ingredients: ["Sweet Lime", "Jaggery", "Ginger", "Green Chili", "Salt"],
     },
@@ -74,14 +84,15 @@ export default function Pickles() {
       id: 4,
       name: "Mixed Vegetable Pickle",
       category: "Mixed",
-      price: "₹279",
-      originalPrice: "₹329",
+      price6oz: "$14.99",
+      price8oz: "$18.99",
+      originalPrice6oz: "$16.99",
+      originalPrice8oz: "$20.99",
       image: "/placeholder.svg",
       rating: 4.9,
       reviews: 203,
       description: "Assorted vegetables in traditional pickle masala",
       spiceLevel: "Medium",
-      weight: "600g",
       badge: "Premium",
       ingredients: ["Carrot", "Cauliflower", "Turnip", "Green Chili", "Spices"],
     },
@@ -89,14 +100,15 @@ export default function Pickles() {
       id: 5,
       name: "Lemon Pickle",
       category: "Citrus",
-      price: "₹169",
-      originalPrice: "₹199",
+      price6oz: "$8.99",
+      price8oz: "$12.99",
+      originalPrice6oz: "$10.99",
+      originalPrice8oz: "$14.99",
       image: "/placeholder.svg",
       rating: 4.5,
       reviews: 95,
       description: "Classic lemon pickle with traditional spices",
       spiceLevel: "Medium",
-      weight: "300g",
       badge: "Classic",
       ingredients: ["Lemon", "Salt", "Turmeric", "Red Chili", "Mustard Seeds"],
     },
@@ -104,14 +116,15 @@ export default function Pickles() {
       id: 6,
       name: "Garlic Pickle",
       category: "Garlic",
-      price: "₹229",
-      originalPrice: "₹269",
+      price6oz: "$11.99",
+      price8oz: "$15.99",
+      originalPrice6oz: "$13.99",
+      originalPrice8oz: "$17.99",
       image: "/placeholder.svg",
       rating: 4.7,
       reviews: 78,
       description: "Pungent garlic pickle with mustard oil",
       spiceLevel: "Hot",
-      weight: "400g",
       badge: "Pungent",
       ingredients: ["Garlic", "Mustard Oil", "Red Chili", "Salt", "Hing"],
     },
@@ -119,14 +132,15 @@ export default function Pickles() {
       id: 7,
       name: "Ginger Pickle",
       category: "Ginger",
-      price: "₹219",
-      originalPrice: "₹259",
+      price6oz: "$10.99",
+      price8oz: "$14.99",
+      originalPrice6oz: "$12.99",
+      originalPrice8oz: "$16.99",
       image: "/placeholder.svg",
       rating: 4.6,
       reviews: 112,
       description: "Fresh ginger pickle with aromatic spices",
       spiceLevel: "Medium",
-      weight: "350g",
       badge: "Fresh",
       ingredients: ["Fresh Ginger", "Lemon Juice", "Salt", "Turmeric", "Oil"],
     },
@@ -134,14 +148,15 @@ export default function Pickles() {
       id: 8,
       name: "Turnip Pickle",
       category: "Vegetable",
-      price: "₹159",
-      originalPrice: "₹189",
+      price6oz: "$8.99",
+      price8oz: "$11.99",
+      originalPrice6oz: "$9.99",
+      originalPrice8oz: "$13.99",
       image: "/placeholder.svg",
       rating: 4.4,
       reviews: 67,
       description: "Crunchy turnip pickle with mustard seeds",
       spiceLevel: "Mild",
-      weight: "400g",
       badge: "Crunchy",
       ingredients: ["Turnip", "Mustard Seeds", "Salt", "Oil", "Spices"],
     },
@@ -223,8 +238,8 @@ export default function Pickles() {
             </h1>
             <p className="text-lg text-spice-muted max-w-2xl mx-auto">
               Discover our authentic collection of handcrafted pickles, made
-              with love using traditional family recipes and the finest
-              ingredients.
+              with love using traditional family recipes. Available in
+              convenient 6oz and 8oz glass bottles.
             </p>
           </div>
         </div>
@@ -288,110 +303,7 @@ export default function Pickles() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredPickles.map((pickle) => (
-              <Card
-                key={pickle.id}
-                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange"
-              >
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <img
-                      src={pickle.image}
-                      alt={pickle.name}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <Badge className="absolute top-3 left-3 bg-spice-yellow text-spice-brown">
-                      {pickle.badge}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
-                    >
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                    <Badge
-                      className={`absolute bottom-3 left-3 ${getSpiceLevelColor(pickle.spiceLevel)}`}
-                    >
-                      {pickle.spiceLevel}
-                    </Badge>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Badge
-                        variant="outline"
-                        className="text-xs border-spice-cream text-spice-muted"
-                      >
-                        {pickle.weight}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="text-xs border-spice-cream text-spice-muted"
-                      >
-                        {pickle.category}
-                      </Badge>
-                    </div>
-
-                    <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
-                      {pickle.name}
-                    </h3>
-
-                    <p className="text-sm text-spice-muted mb-3 line-clamp-2">
-                      {pickle.description}
-                    </p>
-
-                    <div className="flex items-center mb-3">
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${i < Math.floor(pickle.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-sm text-spice-muted ml-2">
-                        ({pickle.reviews})
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {pickle.ingredients.slice(0, 3).map((ingredient, idx) => (
-                        <Badge
-                          key={idx}
-                          variant="secondary"
-                          className="text-xs bg-spice-cream text-spice-brown"
-                        >
-                          {ingredient}
-                        </Badge>
-                      ))}
-                      {pickle.ingredients.length > 3 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-spice-cream text-spice-brown"
-                        >
-                          +{pickle.ingredients.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold text-spice-brown">
-                          {pickle.price}
-                        </span>
-                        <span className="text-sm text-spice-muted line-through ml-2">
-                          {pickle.originalPrice}
-                        </span>
-                      </div>
-                      <Button
-                        size="sm"
-                        className="bg-spice-orange hover:bg-spice-orange/90"
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-1" />
-                        Add
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <PickleCard key={pickle.id} pickle={pickle} />
             ))}
           </div>
 
@@ -431,5 +343,141 @@ export default function Pickles() {
         </div>
       </section>
     </div>
+  );
+}
+
+function PickleCard({ pickle }: { pickle: any }) {
+  const [selectedSize, setSelectedSize] = useState("6oz");
+
+  const getCurrentPrice = () => {
+    return selectedSize === "6oz" ? pickle.price6oz : pickle.price8oz;
+  };
+
+  const getOriginalPrice = () => {
+    return selectedSize === "6oz"
+      ? pickle.originalPrice6oz
+      : pickle.originalPrice8oz;
+  };
+
+  const getSpiceLevelColor = (level: string) => {
+    switch (level) {
+      case "Mild":
+        return "bg-green-100 text-green-800";
+      case "Medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "Hot":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <Card className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange">
+      <CardContent className="p-0">
+        <div className="relative">
+          <img
+            src={pickle.image}
+            alt={pickle.name}
+            className="w-full h-48 object-cover rounded-t-lg"
+          />
+          <Badge className="absolute top-3 left-3 bg-spice-yellow text-spice-brown">
+            {pickle.badge}
+          </Badge>
+          <Button
+            size="sm"
+            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
+          >
+            <Heart className="w-4 h-4" />
+          </Button>
+          <Badge
+            className={`absolute bottom-3 left-3 ${getSpiceLevelColor(pickle.spiceLevel)}`}
+          >
+            {pickle.spiceLevel}
+          </Badge>
+        </div>
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <Select value={selectedSize} onValueChange={setSelectedSize}>
+              <SelectTrigger className="w-20 h-8 text-xs border-spice-cream">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="6oz">6oz</SelectItem>
+                <SelectItem value="8oz">8oz</SelectItem>
+              </SelectContent>
+            </Select>
+            <Badge
+              variant="outline"
+              className="text-xs border-spice-cream text-spice-muted"
+            >
+              {pickle.category}
+            </Badge>
+          </div>
+
+          <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
+            {pickle.name}
+          </h3>
+
+          <p className="text-sm text-spice-muted mb-3 line-clamp-2">
+            {pickle.description}
+          </p>
+
+          <div className="flex items-center mb-3">
+            <div className="flex items-center space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${i < Math.floor(pickle.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
+                />
+              ))}
+            </div>
+            <span className="text-sm text-spice-muted ml-2">
+              ({pickle.reviews})
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-1 mb-3">
+            {pickle.ingredients
+              .slice(0, 3)
+              .map((ingredient: string, idx: number) => (
+                <Badge
+                  key={idx}
+                  variant="secondary"
+                  className="text-xs bg-spice-cream text-spice-brown"
+                >
+                  {ingredient}
+                </Badge>
+              ))}
+            {pickle.ingredients.length > 3 && (
+              <Badge
+                variant="secondary"
+                className="text-xs bg-spice-cream text-spice-brown"
+              >
+                +{pickle.ingredients.length - 3} more
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-lg font-bold text-spice-brown">
+                {getCurrentPrice()}
+              </span>
+              <span className="text-sm text-spice-muted line-through ml-2">
+                {getOriginalPrice()}
+              </span>
+            </div>
+            <Button
+              size="sm"
+              className="bg-spice-orange hover:bg-spice-orange/90"
+            >
+              <ShoppingCart className="w-4 h-4 mr-1" />
+              Add
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -22,8 +22,8 @@ export default function Index() {
   const featuredProducts = [
     {
       name: "Grandma's Mango Pickle",
-      price: "₹249",
-      originalPrice: "₹299",
+      price: "$12.99",
+      originalPrice: "$14.99",
       image: "/placeholder.svg",
       rating: 4.8,
       reviews: 124,
@@ -31,8 +31,8 @@ export default function Index() {
     },
     {
       name: "Authentic Turmeric Powder",
-      price: "₹189",
-      originalPrice: "₹229",
+      price: "$9.99",
+      originalPrice: "$11.99",
       image: "/placeholder.svg",
       rating: 4.9,
       reviews: 89,
@@ -40,8 +40,8 @@ export default function Index() {
     },
     {
       name: "Spicy Red Chili Pickle",
-      price: "₹199",
-      originalPrice: "₹249",
+      price: "$10.99",
+      originalPrice: "$12.99",
       image: "/placeholder.svg",
       rating: 4.7,
       reviews: 156,
@@ -49,8 +49,8 @@ export default function Index() {
     },
     {
       name: "Premium Garam Masala",
-      price: "₹299",
-      originalPrice: "₹349",
+      price: "$15.99",
+      originalPrice: "$17.99",
       image: "/placeholder.svg",
       rating: 4.8,
       reviews: 203,
@@ -69,7 +69,7 @@ export default function Index() {
     <div className="min-h-screen bg-white">
       {/* Promotional Banner */}
       <div className="bg-spice-yellow text-spice-brown text-center py-2 text-sm font-medium">
-        FREE DELIVERY ON ORDERS ABOVE ₹500 | USE CODE: PICKLE50
+        FREE DELIVERY ON ORDERS ABOVE $25 | USE CODE: PICKLE50
       </div>
 
       {/* Header */}
@@ -148,13 +148,13 @@ export default function Index() {
                 POWDERS
               </a>
               <a
-                href="#about"
+                href="/our-story"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
                 OUR STORY
               </a>
               <a
-                href="#contact"
+                href="/contact"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
                 CONTACT
@@ -175,10 +175,10 @@ export default function Index() {
                 <a href="/powders" className="text-spice-muted">
                   POWDERS
                 </a>
-                <a href="#about" className="text-spice-muted">
+                <a href="/our-story" className="text-spice-muted">
                   OUR STORY
                 </a>
-                <a href="#contact" className="text-spice-muted">
+                <a href="/contact" className="text-spice-muted">
                   CONTACT
                 </a>
                 <Separator />
@@ -511,9 +511,9 @@ export default function Index() {
             <div>
               <h4 className="font-semibold mb-4">Contact Info</h4>
               <div className="space-y-2 text-spice-light">
-                <p>📧 hello@spicebazaar.com</p>
-                <p>📞 +91 9876543210</p>
-                <p>📍 Mumbai, Maharashtra</p>
+                <p>📧 hello@thepicklepot.com</p>
+                <p>📞 +1 408 219 1573</p>
+                <p>📍 San Jose, CA, USA</p>
               </div>
             </div>
           </div>
