@@ -40,20 +40,21 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Spice-themed color palette */
+    --spice-brown: 30 45% 15%;
+    --spice-orange: 25 85% 55%;
+    --spice-yellow: 45 95% 75%;
+    --spice-cream: 35 25% 95%;
+    --spice-light: 35 15% 97%;
+    --spice-muted: 30 15% 45%;
   }
 
   .dark {
@@ -92,6 +93,14 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dark mode spice colors */
+    --spice-brown: 35 30% 85%;
+    --spice-orange: 25 75% 65%;
+    --spice-yellow: 45 85% 70%;
+    --spice-cream: 35 15% 15%;
+    --spice-light: 35 10% 12%;
+    --spice-muted: 30 10% 65%;
   }
 }
 
@@ -102,5 +111,84 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+  }
+
+  .font-display {
+    font-family: "Playfair Display", Georgia, serif;
+  }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .text-spice-brown {
+    color: hsl(var(--spice-brown));
+  }
+  .text-spice-orange {
+    color: hsl(var(--spice-orange));
+  }
+  .text-spice-yellow {
+    color: hsl(var(--spice-yellow));
+  }
+  .text-spice-cream {
+    color: hsl(var(--spice-cream));
+  }
+  .text-spice-light {
+    color: hsl(var(--spice-light));
+  }
+  .text-spice-muted {
+    color: hsl(var(--spice-muted));
+  }
+
+  .bg-spice-brown {
+    background-color: hsl(var(--spice-brown));
+  }
+  .bg-spice-orange {
+    background-color: hsl(var(--spice-orange));
+  }
+  .bg-spice-yellow {
+    background-color: hsl(var(--spice-yellow));
+  }
+  .bg-spice-cream {
+    background-color: hsl(var(--spice-cream));
+  }
+  .bg-spice-light {
+    background-color: hsl(var(--spice-light));
+  }
+  .bg-spice-muted {
+    background-color: hsl(var(--spice-muted));
+  }
+
+  .border-spice-brown {
+    border-color: hsl(var(--spice-brown));
+  }
+  .border-spice-orange {
+    border-color: hsl(var(--spice-orange));
+  }
+  .border-spice-yellow {
+    border-color: hsl(var(--spice-yellow));
+  }
+  .border-spice-cream {
+    border-color: hsl(var(--spice-cream));
+  }
+  .border-spice-light {
+    border-color: hsl(var(--spice-light));
+  }
+  .border-spice-muted {
+    border-color: hsl(var(--spice-muted));
+  }
+
+  .hover\:bg-spice-orange\/90:hover {
+    background-color: hsl(var(--spice-orange) / 0.9);
+  }
+
+  .hover\:bg-spice-cream:hover {
+    background-color: hsl(var(--spice-cream));
   }
 }
