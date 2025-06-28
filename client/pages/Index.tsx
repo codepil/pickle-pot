@@ -15,46 +15,72 @@ import {
   X,
   User,
 } from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { AddToCartDialog } from "@/components/AddToCartDialog";
 
 export default function Index() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { state: cartState } = useCart();
+
+  const handleAddToCart = (product: any) => {
+    setSelectedProduct(product);
+    setDialogOpen(true);
+  };
 
   const featuredProducts = [
     {
+      id: 1,
       name: "Grandma's Mango Pickle",
-      price: "$12.99",
-      originalPrice: "$14.99",
+      price6oz: "$12.99",
+      price8oz: "$16.99",
+      originalPrice6oz: "$14.99",
+      originalPrice8oz: "$18.99",
       image: "/placeholder.svg",
       rating: 4.8,
       reviews: 124,
       badge: "Best Seller",
+      category: "pickle" as const,
     },
     {
+      id: 2,
       name: "Authentic Turmeric Powder",
-      price: "$9.99",
-      originalPrice: "$11.99",
+      price6oz: "$9.99",
+      price8oz: "$13.99",
+      originalPrice6oz: "$11.99",
+      originalPrice8oz: "$15.99",
       image: "/placeholder.svg",
       rating: 4.9,
       reviews: 89,
       badge: "Organic",
+      category: "powder" as const,
     },
     {
+      id: 3,
       name: "Spicy Red Chili Pickle",
-      price: "$10.99",
-      originalPrice: "$12.99",
+      price6oz: "$10.99",
+      price8oz: "$14.99",
+      originalPrice6oz: "$12.99",
+      originalPrice8oz: "$16.99",
       image: "/placeholder.svg",
       rating: 4.7,
       reviews: 156,
       badge: "Hot",
+      category: "pickle" as const,
     },
     {
+      id: 4,
       name: "Premium Garam Masala",
-      price: "$15.99",
-      originalPrice: "$17.99",
+      price6oz: "$15.99",
+      price8oz: "$21.99",
+      originalPrice6oz: "$17.99",
+      originalPrice8oz: "$23.99",
       image: "/placeholder.svg",
       rating: 4.8,
       reviews: 203,
       badge: "Premium",
+      category: "powder" as const,
     },
   ];
 
@@ -108,9 +134,12 @@ export default function Index() {
                 <User className="w-4 h-4 mr-2" />
                 Account
               </Button>
-              <Button className="bg-spice-orange hover:bg-spice-orange/90">
+              <Button
+                className="bg-spice-orange hover:bg-spice-orange/90"
+                onClick={() => (window.location.href = "/cart")}
+              >
                 <ShoppingCart className="w-4 h-4 mr-2" />
-                Cart (0)
+                Cart ({cartState.itemCount})
               </Button>
             </div>
 
@@ -186,9 +215,12 @@ export default function Index() {
                   <User className="w-4 h-4 mr-2" />
                   Account
                 </Button>
-                <Button className="bg-spice-orange hover:bg-spice-orange/90 justify-start">
+                <Button
+                  className="bg-spice-orange hover:bg-spice-orange/90 justify-start"
+                  onClick={() => (window.location.href = "/cart")}
+                >
                   <ShoppingCart className="w-4 h-4 mr-2" />
-                  Cart (0)
+                  Cart ({cartState.itemCount})
                 </Button>
               </div>
             </div>
@@ -356,15 +388,16 @@ export default function Index() {
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-lg font-bold text-spice-brown">
-                          {product.price}
+                          {product.price6oz}
                         </span>
                         <span className="text-sm text-spice-muted line-through ml-2">
-                          {product.originalPrice}
+                          {product.originalPrice6oz}
                         </span>
                       </div>
                       <Button
                         size="sm"
                         className="bg-spice-orange hover:bg-spice-orange/90"
+                        onClick={() => handleAddToCart(product)}
                       >
                         Add to Cart
                       </Button>
@@ -535,6 +568,12 @@ export default function Index() {
           </div>
         </div>
       </footer>
+
+      <AddToCartDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={selectedProduct}
+      />
     </div>
   );
 }
