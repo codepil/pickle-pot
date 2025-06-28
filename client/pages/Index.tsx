@@ -16,6 +16,7 @@ import {
   User,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useUser } from "@/context/UserContext";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
 
 export default function Index() {
@@ -23,6 +24,7 @@ export default function Index() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { state: cartState } = useCart();
+  const { state: userState } = useUser();
 
   const handleAddToCart = (product: any) => {
     setSelectedProduct(product);
@@ -130,9 +132,16 @@ export default function Index() {
                 variant="outline"
                 size="sm"
                 className="border-spice-orange text-spice-orange"
+                onClick={() =>
+                  (window.location.href = userState.isAuthenticated
+                    ? "/account"
+                    : "/auth")
+                }
               >
                 <User className="w-4 h-4 mr-2" />
-                Account
+                {userState.isAuthenticated
+                  ? `Hi, ${userState.user?.firstName}`
+                  : "Account"}
               </Button>
               <Button
                 className="bg-spice-orange hover:bg-spice-orange/90"
@@ -211,9 +220,19 @@ export default function Index() {
                   CONTACT
                 </a>
                 <Separator />
-                <Button variant="outline" className="justify-start">
+                <Button
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() =>
+                    (window.location.href = userState.isAuthenticated
+                      ? "/account"
+                      : "/auth")
+                  }
+                >
                   <User className="w-4 h-4 mr-2" />
-                  Account
+                  {userState.isAuthenticated
+                    ? `Hi, ${userState.user?.firstName}`
+                    : "Account"}
                 </Button>
                 <Button
                   className="bg-spice-orange hover:bg-spice-orange/90 justify-start"
