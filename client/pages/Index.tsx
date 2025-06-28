@@ -3,13 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Star,
-  Heart,
-  ChefHat,
-  Leaf,
-  Truck,
-} from "lucide-react";
+import { Star, Heart, ChefHat, Leaf, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Header } from "@/components/Header";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
@@ -89,8 +83,6 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-white">
       <Header />
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-spice-cream to-spice-light py-16 md:py-24">
@@ -422,10 +414,16 @@ export default function Index() {
               © 2025 Pickle Pot. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="/privacy-policy" className="text-spice-light hover:text-white cursor-pointer text-sm">
+              <a
+                href="/privacy-policy"
+                className="text-spice-light hover:text-white cursor-pointer text-sm"
+              >
                 Privacy Policy
               </a>
-              <a href="/terms-conditions" className="text-spice-light hover:text-white cursor-pointer text-sm">
+              <a
+                href="/terms-conditions"
+                className="text-spice-light hover:text-white cursor-pointer text-sm"
+              >
                 Terms & Conditions
               </a>
             </div>
