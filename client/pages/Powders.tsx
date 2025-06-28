@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Filter, Search, ShoppingCart, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useCart } from "@/context/CartContext";
 import { Header } from "@/components/Header";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
 
