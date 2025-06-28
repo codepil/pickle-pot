@@ -12,21 +12,27 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useCart } from "@/context/CartContext";
+import { AddToCartDialog } from "@/components/AddToCartDialog";
 
 export default function Pickles() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { state: cartState } = useCart();
+
+  const handleAddToCart = (product: any) => {
+    setSelectedProduct({
+      ...product,
+      category: "pickle" as const,
+    });
+    setDialogOpen(true);
+  };
 
   const pickles = [
     {
-      id: 1,
+      id: 101,
       name: "Grandma's Mango Pickle",
       category: "Mango",
       price6oz: "$12.99",
@@ -49,7 +55,7 @@ export default function Pickles() {
       ],
     },
     {
-      id: 2,
+      id: 102,
       name: "Spicy Red Chili Pickle",
       category: "Chili",
       price6oz: "$10.99",
@@ -65,7 +71,7 @@ export default function Pickles() {
       ingredients: ["Red Chili", "Sesame Oil", "Garlic", "Salt", "Hing"],
     },
     {
-      id: 3,
+      id: 103,
       name: "Sweet Lime Pickle",
       category: "Citrus",
       price6oz: "$9.99",
@@ -81,7 +87,7 @@ export default function Pickles() {
       ingredients: ["Sweet Lime", "Jaggery", "Ginger", "Green Chili", "Salt"],
     },
     {
-      id: 4,
+      id: 104,
       name: "Mixed Vegetable Pickle",
       category: "Mixed",
       price6oz: "$14.99",
@@ -97,7 +103,7 @@ export default function Pickles() {
       ingredients: ["Carrot", "Cauliflower", "Turnip", "Green Chili", "Spices"],
     },
     {
-      id: 5,
+      id: 105,
       name: "Lemon Pickle",
       category: "Citrus",
       price6oz: "$8.99",
@@ -113,7 +119,7 @@ export default function Pickles() {
       ingredients: ["Lemon", "Salt", "Turmeric", "Red Chili", "Mustard Seeds"],
     },
     {
-      id: 6,
+      id: 106,
       name: "Garlic Pickle",
       category: "Garlic",
       price6oz: "$11.99",
@@ -129,7 +135,7 @@ export default function Pickles() {
       ingredients: ["Garlic", "Mustard Oil", "Red Chili", "Salt", "Hing"],
     },
     {
-      id: 7,
+      id: 107,
       name: "Ginger Pickle",
       category: "Ginger",
       price6oz: "$10.99",
@@ -145,7 +151,7 @@ export default function Pickles() {
       ingredients: ["Fresh Ginger", "Lemon Juice", "Salt", "Turmeric", "Oil"],
     },
     {
-      id: 8,
+      id: 108,
       name: "Turnip Pickle",
       category: "Vegetable",
       price6oz: "$8.99",
@@ -303,7 +309,113 @@ export default function Pickles() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredPickles.map((pickle) => (
-              <PickleCard key={pickle.id} pickle={pickle} />
+              <Card
+                key={pickle.id}
+                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange"
+              >
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <img
+                      src={pickle.image}
+                      alt={pickle.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                    <Badge className="absolute top-3 left-3 bg-spice-yellow text-spice-brown">
+                      {pickle.badge}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
+                    >
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                    <Badge
+                      className={`absolute bottom-3 left-3 ${getSpiceLevelColor(pickle.spiceLevel)}`}
+                    >
+                      {pickle.spiceLevel}
+                    </Badge>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-spice-cream text-spice-muted"
+                      >
+                        6oz & 8oz
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-spice-cream text-spice-muted"
+                      >
+                        {pickle.category}
+                      </Badge>
+                    </div>
+
+                    <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
+                      {pickle.name}
+                    </h3>
+
+                    <p className="text-sm text-spice-muted mb-3 line-clamp-2">
+                      {pickle.description}
+                    </p>
+
+                    <div className="flex items-center mb-3">
+                      <div className="flex items-center space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < Math.floor(pickle.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-spice-muted ml-2">
+                        ({pickle.reviews})
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {pickle.ingredients
+                        .slice(0, 3)
+                        .map((ingredient: string, idx: number) => (
+                          <Badge
+                            key={idx}
+                            variant="secondary"
+                            className="text-xs bg-spice-cream text-spice-brown"
+                          >
+                            {ingredient}
+                          </Badge>
+                        ))}
+                      {pickle.ingredients.length > 3 && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-spice-cream text-spice-brown"
+                        >
+                          +{pickle.ingredients.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold text-spice-brown">
+                          {pickle.price6oz}
+                        </span>
+                        <span className="text-sm text-spice-muted line-through ml-2">
+                          {pickle.originalPrice6oz}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-spice-orange hover:bg-spice-orange/90"
+                        onClick={() => handleAddToCart(pickle)}
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -342,142 +454,12 @@ export default function Pickles() {
           </div>
         </div>
       </section>
+
+      <AddToCartDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={selectedProduct}
+      />
     </div>
-  );
-}
-
-function PickleCard({ pickle }: { pickle: any }) {
-  const [selectedSize, setSelectedSize] = useState("6oz");
-
-  const getCurrentPrice = () => {
-    return selectedSize === "6oz" ? pickle.price6oz : pickle.price8oz;
-  };
-
-  const getOriginalPrice = () => {
-    return selectedSize === "6oz"
-      ? pickle.originalPrice6oz
-      : pickle.originalPrice8oz;
-  };
-
-  const getSpiceLevelColor = (level: string) => {
-    switch (level) {
-      case "Mild":
-        return "bg-green-100 text-green-800";
-      case "Medium":
-        return "bg-yellow-100 text-yellow-800";
-      case "Hot":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  return (
-    <Card className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange">
-      <CardContent className="p-0">
-        <div className="relative">
-          <img
-            src={pickle.image}
-            alt={pickle.name}
-            className="w-full h-48 object-cover rounded-t-lg"
-          />
-          <Badge className="absolute top-3 left-3 bg-spice-yellow text-spice-brown">
-            {pickle.badge}
-          </Badge>
-          <Button
-            size="sm"
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
-          >
-            <Heart className="w-4 h-4" />
-          </Button>
-          <Badge
-            className={`absolute bottom-3 left-3 ${getSpiceLevelColor(pickle.spiceLevel)}`}
-          >
-            {pickle.spiceLevel}
-          </Badge>
-        </div>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="w-20 h-8 text-xs border-spice-cream">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="6oz">6oz</SelectItem>
-                <SelectItem value="8oz">8oz</SelectItem>
-              </SelectContent>
-            </Select>
-            <Badge
-              variant="outline"
-              className="text-xs border-spice-cream text-spice-muted"
-            >
-              {pickle.category}
-            </Badge>
-          </div>
-
-          <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
-            {pickle.name}
-          </h3>
-
-          <p className="text-sm text-spice-muted mb-3 line-clamp-2">
-            {pickle.description}
-          </p>
-
-          <div className="flex items-center mb-3">
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${i < Math.floor(pickle.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-spice-muted ml-2">
-              ({pickle.reviews})
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-1 mb-3">
-            {pickle.ingredients
-              .slice(0, 3)
-              .map((ingredient: string, idx: number) => (
-                <Badge
-                  key={idx}
-                  variant="secondary"
-                  className="text-xs bg-spice-cream text-spice-brown"
-                >
-                  {ingredient}
-                </Badge>
-              ))}
-            {pickle.ingredients.length > 3 && (
-              <Badge
-                variant="secondary"
-                className="text-xs bg-spice-cream text-spice-brown"
-              >
-                +{pickle.ingredients.length - 3} more
-              </Badge>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-lg font-bold text-spice-brown">
-                {getCurrentPrice()}
-              </span>
-              <span className="text-sm text-spice-muted line-through ml-2">
-                {getOriginalPrice()}
-              </span>
-            </div>
-            <Button
-              size="sm"
-              className="bg-spice-orange hover:bg-spice-orange/90"
-            >
-              <ShoppingCart className="w-4 h-4 mr-1" />
-              Add
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
