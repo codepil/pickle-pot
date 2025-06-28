@@ -35,7 +35,7 @@ export function Header({
       <div className="max-w-7xl mx-auto px-4">
         {/* Promotional Banner */}
         <div className="bg-spice-yellow text-spice-brown text-center py-2 text-sm font-medium">
-          FREE DELIVERY ON ORDERS ABOVE $25 | USE CODE: PICKLE50
+          FREE DELIVERY ON ORDERS ABOVE $25 | USE CODE: PICKLE25
         </div>
 
         {/* Main Header */}
