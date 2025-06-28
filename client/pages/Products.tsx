@@ -9,12 +9,15 @@ export default function Products() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-spice-orange rounded-full flex items-center justify-center">
-                <ChefHat className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-spice-orange rounded-lg flex items-center justify-center relative">
+                <div className="w-8 h-6 bg-white rounded-full relative">
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-spice-brown rounded-full"></div>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-white rounded-b-full border-2 border-spice-brown"></div>
+                </div>
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-spice-brown font-display">
-                  Nattu Paakam
+                  Pickle Pot
                 </h1>
                 <p className="text-xs text-spice-muted">
                   Authentic • Fresh • Traditional

@@ -78,12 +78,15 @@ export default function Index() {
           {/* Top Header */}
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-spice-orange rounded-full flex items-center justify-center">
-                <ChefHat className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-spice-orange rounded-lg flex items-center justify-center relative">
+                <div className="w-8 h-6 bg-white rounded-full relative">
+                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-spice-brown rounded-full"></div>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-white rounded-b-full border-2 border-spice-brown"></div>
+                </div>
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-spice-brown font-display">
-                  Nattu Paakam
+                  Pickle Pot
                 </h1>
                 <p className="text-xs text-spice-muted">
                   Authentic • Fresh • Traditional
@@ -392,7 +395,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-spice-brown mb-4 font-display">
-              Why Choose Nattu Paakam?
+              Why Choose Pickle Pot?
             </h2>
           </div>
 
@@ -445,11 +448,14 @@ export default function Index() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-spice-orange rounded-full flex items-center justify-center">
-                  <ChefHat className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 bg-spice-orange rounded-lg flex items-center justify-center relative">
+                  <div className="w-5 h-4 bg-white rounded-full relative">
+                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3 h-0.5 bg-spice-brown rounded-full"></div>
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-2.5 h-1 bg-white rounded-b-full border border-spice-brown"></div>
+                  </div>
                 </div>
                 <span className="text-xl font-bold font-display">
-                  Nattu Paakam
+                  Pickle Pot
                 </span>
               </div>
               <p className="text-spice-light mb-4">
@@ -519,7 +525,7 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-spice-light text-sm">
-              © 2024 Nattu Paakam. All rights reserved.
+              © 2024 Pickle Pot. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <span className="text-spice-light hover:text-white cursor-pointer text-sm">
