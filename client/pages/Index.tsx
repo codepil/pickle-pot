@@ -69,7 +69,7 @@ export default function Index() {
     <div className="min-h-screen bg-white">
       {/* Promotional Banner */}
       <div className="bg-spice-yellow text-spice-brown text-center py-2 text-sm font-medium">
-        FREE DELIVERY ON ORDERS ABOVE ₹500 | USE CODE: SPICE50
+        FREE DELIVERY ON ORDERS ABOVE ₹500 | USE CODE: PICKLE50
       </div>
 
       {/* Header */}
@@ -89,7 +89,7 @@ export default function Index() {
                   Pickle Pot
                 </h1>
                 <p className="text-xs text-spice-muted">
-                  Authentic • Fresh • Traditional
+                  Authentic • Traditional • Fresh
                 </p>
               </div>
             </div>
@@ -99,10 +99,7 @@ export default function Index() {
                 <Truck className="w-4 h-4" />
                 <span>Free Delivery</span>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-spice-muted">
-                <Shield className="w-4 h-4" />
-                <span>Quality Assured</span>
-              </div>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -459,8 +456,8 @@ export default function Index() {
                 </span>
               </div>
               <p className="text-spice-light mb-4">
-                Bringing authentic flavors to your kitchen since 1985. Quality,
-                tradition, and taste in every product.
+                Bringing authentic flavors to your Dinning table since 1985.
+                Quality, tradition, and taste in every product.
               </p>
               <div className="flex space-x-4">
                 <div className="w-8 h-8 bg-spice-orange rounded-full flex items-center justify-center cursor-pointer">
@@ -525,7 +522,7 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-spice-light text-sm">
-              © 2024 Pickle Pot. All rights reserved.
+              © 2025 Pickle Pot. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <span className="text-spice-light hover:text-white cursor-pointer text-sm">

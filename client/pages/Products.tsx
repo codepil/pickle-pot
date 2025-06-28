@@ -20,7 +20,7 @@ export default function Products() {
                   Pickle Pot
                 </h1>
                 <p className="text-xs text-spice-muted">
-                  Authentic • Fresh • Traditional
+                  Authentic • Traditional • Fresh
                 </p>
               </div>
             </div>
