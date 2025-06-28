@@ -136,13 +136,13 @@ export default function Index() {
                 HOME
               </a>
               <a
-                href="#pickles"
+                href="/pickles"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
                 PICKLES
               </a>
               <a
-                href="#powders"
+                href="/powders"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
                 POWDERS
@@ -169,10 +169,10 @@ export default function Index() {
                 <a href="#" className="text-spice-brown font-medium">
                   HOME
                 </a>
-                <a href="#pickles" className="text-spice-muted">
+                <a href="/pickles" className="text-spice-muted">
                   PICKLES
                 </a>
-                <a href="#powders" className="text-spice-muted">
+                <a href="/powders" className="text-spice-muted">
                   POWDERS
                 </a>
                 <a href="#about" className="text-spice-muted">
