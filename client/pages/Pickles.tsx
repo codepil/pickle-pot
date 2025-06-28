@@ -2,17 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Star,
-  Filter,
-  Search,
-  ShoppingCart,
-  Heart,
-  ChefHat,
-  ArrowLeft,
-} from "lucide-react";
+import { Star, Filter, Search, ShoppingCart, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/context/CartContext";
+import { Header } from "@/components/Header";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
 
 export default function Pickles() {
@@ -203,37 +195,7 @@ export default function Pickles() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-spice-cream z-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-spice-orange rounded-lg flex items-center justify-center relative">
-                <div className="w-8 h-6 bg-white rounded-full relative">
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-spice-brown rounded-full"></div>
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-4 h-2 bg-white rounded-b-full border-2 border-spice-brown"></div>
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-spice-brown font-display">
-                  Pickle Pot
-                </h1>
-                <p className="text-xs text-spice-muted">
-                  Authentic • Traditional • Fresh
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="border-spice-orange text-spice-orange"
-              onClick={() => window.history.back()}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header showBackButton backButtonText="Back to Home" />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-spice-cream to-spice-light py-12">
