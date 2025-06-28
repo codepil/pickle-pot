@@ -14,7 +14,7 @@ export default function Products() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-spice-brown font-display">
-                  Spice Bazaar
+                  Nattu Paakam
                 </h1>
                 <p className="text-xs text-spice-muted">
                   Authentic • Fresh • Traditional

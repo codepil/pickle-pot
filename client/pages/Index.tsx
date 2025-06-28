@@ -83,7 +83,7 @@ export default function Index() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-spice-brown font-display">
-                  Spice Bazaar
+                  Nattu Paakam
                 </h1>
                 <p className="text-xs text-spice-muted">
                   Authentic • Fresh • Traditional
@@ -392,7 +392,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-spice-brown mb-4 font-display">
-              Why Choose Spice Bazaar?
+              Why Choose Nattu Paakam?
             </h2>
           </div>
 
@@ -449,7 +449,7 @@ export default function Index() {
                   <ChefHat className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-xl font-bold font-display">
-                  Spice Bazaar
+                  Nattu Paakam
                 </span>
               </div>
               <p className="text-spice-light mb-4">
@@ -519,7 +519,7 @@ export default function Index() {
 
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-spice-light text-sm">
-              © 2024 Spice Bazaar. All rights reserved.
+              © 2024 Nattu Paakam. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <span className="text-spice-light hover:text-white cursor-pointer text-sm">
