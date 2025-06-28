@@ -12,21 +12,27 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useCart } from "@/context/CartContext";
+import { AddToCartDialog } from "@/components/AddToCartDialog";
 
 export default function Powders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { state: cartState } = useCart();
+
+  const handleAddToCart = (product: any) => {
+    setSelectedProduct({
+      ...product,
+      category: "powder" as const,
+    });
+    setDialogOpen(true);
+  };
 
   const powders = [
     {
-      id: 1,
+      id: 201,
       name: "Authentic Turmeric Powder",
       category: "Single Spice",
       price6oz: "$9.99",
@@ -43,7 +49,7 @@ export default function Powders() {
       origin: "Maharashtra",
     },
     {
-      id: 2,
+      id: 202,
       name: "Premium Garam Masala",
       category: "Blend",
       price6oz: "$15.99",
@@ -60,7 +66,7 @@ export default function Powders() {
       origin: "Traditional Recipe",
     },
     {
-      id: 3,
+      id: 203,
       name: "Red Chili Powder",
       category: "Single Spice",
       price6oz: "$7.99",
@@ -341,7 +347,118 @@ export default function Powders() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredPowders.map((powder) => (
-              <PowderCard key={powder.id} powder={powder} />
+              <Card
+                key={powder.id}
+                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange"
+              >
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <img
+                      src={powder.image}
+                      alt={powder.name}
+                      className="w-full h-48 object-cover rounded-t-lg"
+                    />
+                    <Badge
+                      className={`absolute top-3 left-3 ${getBadgeColor(powder.badge)}`}
+                    >
+                      {powder.badge}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
+                    >
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                    <Badge className="absolute bottom-3 left-3 bg-white text-spice-brown">
+                      {powder.type}
+                    </Badge>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-spice-cream text-spice-muted"
+                      >
+                        6oz & 8oz
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-spice-cream text-spice-muted"
+                      >
+                        {powder.category}
+                      </Badge>
+                    </div>
+
+                    <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
+                      {powder.name}
+                    </h3>
+
+                    <p className="text-sm text-spice-muted mb-3 line-clamp-2">
+                      {powder.description}
+                    </p>
+
+                    <div className="flex items-center mb-3">
+                      <div className="flex items-center space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${i < Math.floor(powder.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-spice-muted ml-2">
+                        ({powder.reviews})
+                      </span>
+                    </div>
+
+                    <div className="mb-3">
+                      <p className="text-xs text-spice-muted mb-1">
+                        Origin: {powder.origin}
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {powder.uses
+                          .slice(0, 2)
+                          .map((use: string, idx: number) => (
+                            <Badge
+                              key={idx}
+                              variant="secondary"
+                              className="text-xs bg-spice-cream text-spice-brown"
+                            >
+                              {use}
+                            </Badge>
+                          ))}
+                        {powder.uses.length > 2 && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-spice-cream text-spice-brown"
+                          >
+                            +{powder.uses.length - 2} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold text-spice-brown">
+                          {powder.price6oz}
+                        </span>
+                        <span className="text-sm text-spice-muted line-through ml-2">
+                          {powder.originalPrice6oz}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-spice-orange hover:bg-spice-orange/90"
+                        onClick={() => handleAddToCart(powder)}
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
 
@@ -380,157 +497,12 @@ export default function Powders() {
           </div>
         </div>
       </section>
+
+      <AddToCartDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={selectedProduct}
+      />
     </div>
-  );
-}
-
-function PowderCard({ powder }: { powder: any }) {
-  const [selectedSize, setSelectedSize] = useState("6oz");
-
-  const getCurrentPrice = () => {
-    return selectedSize === "6oz" ? powder.price6oz : powder.price8oz;
-  };
-
-  const getOriginalPrice = () => {
-    return selectedSize === "6oz"
-      ? powder.originalPrice6oz
-      : powder.originalPrice8oz;
-  };
-
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case "Organic":
-        return "bg-green-100 text-green-800";
-      case "Premium":
-        return "bg-purple-100 text-purple-800";
-      case "Hot":
-        return "bg-red-100 text-red-800";
-      case "Fresh":
-        return "bg-blue-100 text-blue-800";
-      case "Authentic":
-        return "bg-orange-100 text-orange-800";
-      case "Royal":
-        return "bg-yellow-100 text-yellow-800";
-      case "Pure":
-        return "bg-gray-100 text-gray-800";
-      case "Versatile":
-        return "bg-indigo-100 text-indigo-800";
-      case "Smoky":
-        return "bg-stone-100 text-stone-800";
-      default:
-        return "bg-spice-yellow text-spice-brown";
-    }
-  };
-
-  return (
-    <Card className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange">
-      <CardContent className="p-0">
-        <div className="relative">
-          <img
-            src={powder.image}
-            alt={powder.name}
-            className="w-full h-48 object-cover rounded-t-lg"
-          />
-          <Badge
-            className={`absolute top-3 left-3 ${getBadgeColor(powder.badge)}`}
-          >
-            {powder.badge}
-          </Badge>
-          <Button
-            size="sm"
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
-          >
-            <Heart className="w-4 h-4" />
-          </Button>
-          <Badge className="absolute bottom-3 left-3 bg-white text-spice-brown">
-            {powder.type}
-          </Badge>
-        </div>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="w-20 h-8 text-xs border-spice-cream">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="6oz">6oz</SelectItem>
-                <SelectItem value="8oz">8oz</SelectItem>
-              </SelectContent>
-            </Select>
-            <Badge
-              variant="outline"
-              className="text-xs border-spice-cream text-spice-muted"
-            >
-              {powder.category}
-            </Badge>
-          </div>
-
-          <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
-            {powder.name}
-          </h3>
-
-          <p className="text-sm text-spice-muted mb-3 line-clamp-2">
-            {powder.description}
-          </p>
-
-          <div className="flex items-center mb-3">
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${i < Math.floor(powder.rating) ? "fill-spice-yellow text-spice-yellow" : "text-gray-300"}`}
-                />
-              ))}
-            </div>
-            <span className="text-sm text-spice-muted ml-2">
-              ({powder.reviews})
-            </span>
-          </div>
-
-          <div className="mb-3">
-            <p className="text-xs text-spice-muted mb-1">
-              Origin: {powder.origin}
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {powder.uses.slice(0, 2).map((use: string, idx: number) => (
-                <Badge
-                  key={idx}
-                  variant="secondary"
-                  className="text-xs bg-spice-cream text-spice-brown"
-                >
-                  {use}
-                </Badge>
-              ))}
-              {powder.uses.length > 2 && (
-                <Badge
-                  variant="secondary"
-                  className="text-xs bg-spice-cream text-spice-brown"
-                >
-                  +{powder.uses.length - 2} more
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-lg font-bold text-spice-brown">
-                {getCurrentPrice()}
-              </span>
-              <span className="text-sm text-spice-muted line-through ml-2">
-                {getOriginalPrice()}
-              </span>
-            </div>
-            <Button
-              size="sm"
-              className="bg-spice-orange hover:bg-spice-orange/90"
-            >
-              <ShoppingCart className="w-4 h-4 mr-1" />
-              Add
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
