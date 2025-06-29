@@ -67,6 +67,15 @@ type UserAction =
 
 // Load initial state from localStorage
 const loadInitialState = (): UserState => {
+  // Check if running in browser (not SSR)
+  if (typeof window === "undefined") {
+    return {
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+    };
+  }
+
   try {
     const savedUser = localStorage.getItem("picklepot_user");
     if (savedUser) {
