@@ -65,11 +65,29 @@ type UserAction =
     }
   | { type: "DELETE_PAYMENT_METHOD"; payload: string };
 
-const initialState: UserState = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
+// Load initial state from localStorage
+const loadInitialState = (): UserState => {
+  try {
+    const savedUser = localStorage.getItem("picklepot_user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      return {
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+      };
+    }
+  } catch (error) {
+    console.error("Error loading user from localStorage:", error);
+  }
+  return {
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+  };
 };
+
+const initialState: UserState = loadInitialState();
 
 const UserContext = createContext<{
   state: UserState;
@@ -85,6 +103,12 @@ function userReducer(state: UserState, action: UserAction): UserState {
       return { ...state, isLoading: true };
 
     case "LOGIN_SUCCESS":
+      // Save user to localStorage
+      try {
+        localStorage.setItem("picklepot_user", JSON.stringify(action.payload));
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
         user: action.payload,
@@ -101,6 +125,12 @@ function userReducer(state: UserState, action: UserAction): UserState {
       };
 
     case "LOGOUT":
+      // Clear user from localStorage
+      try {
+        localStorage.removeItem("picklepot_user");
+      } catch (error) {
+        console.error("Error clearing user from localStorage:", error);
+      }
       return {
         ...state,
         user: null,
@@ -110,9 +140,16 @@ function userReducer(state: UserState, action: UserAction): UserState {
 
     case "UPDATE_PROFILE":
       if (!state.user) return state;
+      const updatedUser = { ...state.user, ...action.payload };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem("picklepot_user", JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error("Error saving updated user to localStorage:", error);
+      }
       return {
         ...state,
-        user: { ...state.user, ...action.payload },
+        user: updatedUser,
       };
 
     case "ADD_ADDRESS":
