@@ -157,11 +157,13 @@ function userReducer(state: UserState, action: UserAction): UserState {
     case "UPDATE_PROFILE":
       if (!state.user) return state;
       const updatedUser = { ...state.user, ...action.payload };
-      // Save updated user to localStorage
-      try {
-        localStorage.setItem("picklepot_user", JSON.stringify(updatedUser));
-      } catch (error) {
-        console.error("Error saving updated user to localStorage:", error);
+      // Save updated user to localStorage (only in browser)
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("picklepot_user", JSON.stringify(updatedUser));
+        } catch (error) {
+          console.error("Error saving updated user to localStorage:", error);
+        }
       }
       return {
         ...state,
