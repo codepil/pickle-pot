@@ -25,11 +25,8 @@ import {
 import {
   ArrowLeft,
   User,
-  Settings,
   MapPin,
   CreditCard,
-  Bell,
-  Shield,
   LogOut,
   Edit,
   Plus,
@@ -37,11 +34,9 @@ import {
   Mail,
   Phone,
   Calendar,
-  Clock,
   MessageSquare,
   Home,
   Building,
-  Heart,
 } from "lucide-react";
 import { useUser, Address, PaymentMethod } from "@/context/UserContext";
 
@@ -294,7 +289,7 @@ export default function Account() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger
               value="profile"
               className="flex items-center space-x-2"
@@ -315,13 +310,6 @@ export default function Account() {
             >
               <CreditCard className="w-4 h-4" />
               <span>Payment</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="preferences"
-              className="flex items-center space-x-2"
-            >
-              <Settings className="w-4 h-4" />
-              <span>Preferences</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1099,106 +1087,6 @@ export default function Account() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Preferences Tab */}
-          <TabsContent value="preferences">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card className="border-spice-cream">
-                <CardHeader>
-                  <CardTitle className="text-spice-brown flex items-center">
-                    <Bell className="w-5 h-5 mr-2" />
-                    Notification Preferences
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-spice-brown">
-                        Order Updates
-                      </p>
-                      <p className="text-sm text-spice-muted">
-                        Get notified about order status changes
-                      </p>
-                    </div>
-                    <input type="checkbox" defaultChecked className="rounded" />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-spice-brown">
-                        New Products
-                      </p>
-                      <p className="text-sm text-spice-muted">
-                        Be the first to know about new pickles and spices
-                      </p>
-                    </div>
-                    <input type="checkbox" defaultChecked className="rounded" />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-spice-brown">Promotions</p>
-                      <p className="text-sm text-spice-muted">
-                        Receive special offers and discounts
-                      </p>
-                    </div>
-                    <input type="checkbox" defaultChecked className="rounded" />
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-spice-brown">
-                        Recipe Tips
-                      </p>
-                      <p className="text-sm text-spice-muted">
-                        Get cooking tips and recipe suggestions
-                      </p>
-                    </div>
-                    <input type="checkbox" className="rounded" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-spice-cream">
-                <CardHeader>
-                  <CardTitle className="text-spice-brown flex items-center">
-                    <Shield className="w-5 h-5 mr-2" />
-                    Privacy & Security
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-spice-cream"
-                  >
-                    <Lock className="w-4 h-4 mr-2" />
-                    Change Password
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-spice-cream"
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    Two-Factor Authentication
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-spice-cream"
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    Download My Data
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-red-300 text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Delete Account
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
         </Tabs>
       </div>
