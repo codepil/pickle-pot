@@ -186,9 +186,6 @@ export function Header({
                   <a href="/contact" className="text-spice-muted">
                     CONTACT
                   </a>
-                  <a href="/faq" className="text-spice-muted">
-                    FAQ
-                  </a>
                   <Separator />
                 </>
               )}
