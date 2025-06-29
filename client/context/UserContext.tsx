@@ -112,11 +112,16 @@ function userReducer(state: UserState, action: UserAction): UserState {
       return { ...state, isLoading: true };
 
     case "LOGIN_SUCCESS":
-      // Save user to localStorage
-      try {
-        localStorage.setItem("picklepot_user", JSON.stringify(action.payload));
-      } catch (error) {
-        console.error("Error saving user to localStorage:", error);
+      // Save user to localStorage (only in browser)
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(
+            "picklepot_user",
+            JSON.stringify(action.payload),
+          );
+        } catch (error) {
+          console.error("Error saving user to localStorage:", error);
+        }
       }
       return {
         ...state,
@@ -134,11 +139,13 @@ function userReducer(state: UserState, action: UserAction): UserState {
       };
 
     case "LOGOUT":
-      // Clear user from localStorage
-      try {
-        localStorage.removeItem("picklepot_user");
-      } catch (error) {
-        console.error("Error clearing user from localStorage:", error);
+      // Clear user from localStorage (only in browser)
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.removeItem("picklepot_user");
+        } catch (error) {
+          console.error("Error clearing user from localStorage:", error);
+        }
       }
       return {
         ...state,
