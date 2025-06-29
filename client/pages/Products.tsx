@@ -27,6 +27,7 @@ export default function Products() {
             <Button
               variant="outline"
               className="border-spice-orange text-spice-orange"
+              onClick={() => (window.location.href = "/")}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home

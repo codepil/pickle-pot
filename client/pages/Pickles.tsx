@@ -7,12 +7,15 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { Header } from "@/components/Header";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 export default function Pickles() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productDetailOpen, setProductDetailOpen] = useState(false);
+  const [selectedProductDetail, setSelectedProductDetail] = useState(null);
   const { state: cartState } = useCart();
 
   const handleAddToCart = (product: any) => {
@@ -21,6 +24,14 @@ export default function Pickles() {
       category: "pickle" as const,
     });
     setDialogOpen(true);
+  };
+
+  const handleProductClick = (product: any) => {
+    setSelectedProductDetail({
+      ...product,
+      category: "pickle" as const,
+    });
+    setProductDetailOpen(true);
   };
 
   const pickles = [
@@ -274,10 +285,13 @@ export default function Pickles() {
             {filteredPickles.map((pickle) => (
               <Card
                 key={pickle.id}
-                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange"
+                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange cursor-pointer"
               >
                 <CardContent className="p-0">
-                  <div className="relative">
+                  <div
+                    className="relative"
+                    onClick={() => handleProductClick(pickle)}
+                  >
                     <img
                       src={pickle.image}
                       alt={pickle.name}
@@ -289,6 +303,10 @@ export default function Pickles() {
                     <Button
                       size="sm"
                       className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle wishlist functionality
+                      }}
                     >
                       <Heart className="w-4 h-4" />
                     </Button>
@@ -298,7 +316,10 @@ export default function Pickles() {
                       {pickle.spiceLevel}
                     </Badge>
                   </div>
-                  <div className="p-4">
+                  <div
+                    className="p-4"
+                    onClick={() => handleProductClick(pickle)}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <Badge
                         variant="outline"
@@ -370,7 +391,10 @@ export default function Pickles() {
                       <Button
                         size="sm"
                         className="bg-spice-orange hover:bg-spice-orange/90"
-                        onClick={() => handleAddToCart(pickle)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(pickle);
+                        }}
                       >
                         <ShoppingCart className="w-4 h-4 mr-1" />
                         Add
@@ -422,6 +446,12 @@ export default function Pickles() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         product={selectedProduct}
+      />
+
+      <ProductDetailModal
+        open={productDetailOpen}
+        onOpenChange={setProductDetailOpen}
+        product={selectedProductDetail}
       />
     </div>
   );

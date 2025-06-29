@@ -146,7 +146,7 @@ export function Header({
                 href="/contact"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
-                Contact
+                CONTACT
               </a>
             </div>
           </nav>
