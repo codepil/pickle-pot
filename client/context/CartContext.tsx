@@ -3,12 +3,12 @@ import React, { createContext, useContext, useReducer, ReactNode } from "react";
 interface CartItem {
   id: string;
   name: string;
-  price: string;
-  originalPrice: string;
+  price: string | number;
+  originalPrice?: string;
   image: string;
   size: string;
   quantity: number;
-  deliveryDate: string;
+  deliveryDate?: string;
   category: "pickle" | "powder";
   badge?: string;
 }
@@ -58,7 +58,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       }
 
       const total = newItems.reduce((sum, item) => {
-        const price = parseFloat(item.price.replace("$", ""));
+        const price =
+          typeof item.price === "string"
+            ? parseFloat(item.price.replace("$", ""))
+            : item.price;
         return sum + price * item.quantity;
       }, 0);
 
@@ -74,7 +77,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "REMOVE_ITEM": {
       const newItems = state.items.filter((item) => item.id !== action.payload);
       const total = newItems.reduce((sum, item) => {
-        const price = parseFloat(item.price.replace("$", ""));
+        const price =
+          typeof item.price === "string"
+            ? parseFloat(item.price.replace("$", ""))
+            : item.price;
         return sum + price * item.quantity;
       }, 0);
       const itemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -96,7 +102,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         .filter((item) => item.quantity > 0);
 
       const total = newItems.reduce((sum, item) => {
-        const price = parseFloat(item.price.replace("$", ""));
+        const price =
+          typeof item.price === "string"
+            ? parseFloat(item.price.replace("$", ""))
+            : item.price;
         return sum + price * item.quantity;
       }, 0);
 
