@@ -7,15 +7,23 @@ import { Star, Heart, ChefHat, Leaf, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Header } from "@/components/Header";
 import { AddToCartDialog } from "@/components/AddToCartDialog";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
 
 export default function Index() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productDetailOpen, setProductDetailOpen] = useState(false);
+  const [selectedProductDetail, setSelectedProductDetail] = useState(null);
   const { state: cartState } = useCart();
 
   const handleAddToCart = (product: any) => {
     setSelectedProduct(product);
     setDialogOpen(true);
+  };
+
+  const handleProductClick = (product: any) => {
+    setSelectedProductDetail(product);
+    setProductDetailOpen(true);
   };
 
   const featuredProducts = [
@@ -74,11 +82,35 @@ export default function Index() {
   ];
 
   const categories = [
-    { name: "Traditional Pickles", icon: "🥒", count: "12+ varieties" },
-    { name: "Spice Powders", icon: "🌶️", count: "15+ blends" },
-    { name: "Curry Powders", icon: "🍛", count: "8+ authentic" },
-    { name: "Seasonal Specials", icon: "🎃", count: "Limited time" },
+    {
+      name: "Traditional Pickles",
+      icon: "🥒",
+      count: "12+ varieties",
+      path: "/pickles",
+    },
+    {
+      name: "Spice Powders",
+      icon: "🌶️",
+      count: "15+ blends",
+      path: "/powders",
+    },
+    {
+      name: "Curry Powders",
+      icon: "🍛",
+      count: "8+ authentic",
+      path: "/powders",
+    },
+    {
+      name: "Seasonal Specials",
+      icon: "🎃",
+      count: "Limited time",
+      path: "/products",
+    },
   ];
+
+  const handleCategoryClick = (path: string) => {
+    window.location.href = path;
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -106,6 +138,7 @@ export default function Index() {
                 <Button
                   size="lg"
                   className="bg-spice-orange hover:bg-spice-orange/90 text-lg px-8"
+                  onClick={() => (window.location.href = "/pickles")}
                 >
                   Shop Now
                 </Button>
@@ -113,6 +146,7 @@ export default function Index() {
                   size="lg"
                   variant="outline"
                   className="border-spice-orange text-spice-orange text-lg px-8"
+                  onClick={() => (window.location.href = "/our-story")}
                 >
                   Our Story
                 </Button>
@@ -174,6 +208,7 @@ export default function Index() {
               <Card
                 key={index}
                 className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-spice-cream hover:border-spice-orange"
+                onClick={() => handleCategoryClick(category.path)}
               >
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl mb-4">{category.icon}</div>
@@ -205,10 +240,13 @@ export default function Index() {
             {featuredProducts.map((product, index) => (
               <Card
                 key={index}
-                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange"
+                className="group hover:shadow-xl transition-all duration-300 border-spice-cream hover:border-spice-orange cursor-pointer"
               >
                 <CardContent className="p-0">
-                  <div className="relative">
+                  <div
+                    className="relative"
+                    onClick={() => handleProductClick(product)}
+                  >
                     <img
                       src={product.image}
                       alt={product.name}
@@ -220,11 +258,18 @@ export default function Index() {
                     <Button
                       size="sm"
                       className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white text-spice-orange hover:bg-spice-cream"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Handle wishlist functionality
+                      }}
                     >
                       <Heart className="w-4 h-4" />
                     </Button>
                   </div>
-                  <div className="p-4">
+                  <div
+                    className="p-4"
+                    onClick={() => handleProductClick(product)}
+                  >
                     <h3 className="font-semibold text-spice-brown mb-2 group-hover:text-spice-orange transition-colors">
                       {product.name}
                     </h3>
@@ -253,7 +298,10 @@ export default function Index() {
                       <Button
                         size="sm"
                         className="bg-spice-orange hover:bg-spice-orange/90"
-                        onClick={() => handleAddToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
                       >
                         Add to Cart
                       </Button>
@@ -269,6 +317,7 @@ export default function Index() {
               size="lg"
               variant="outline"
               className="border-spice-orange text-spice-orange px-8"
+              onClick={() => (window.location.href = "/products")}
             >
               View All Products
             </Button>
@@ -438,6 +487,12 @@ export default function Index() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         product={selectedProduct}
+      />
+
+      <ProductDetailModal
+        open={productDetailOpen}
+        onOpenChange={setProductDetailOpen}
+        product={selectedProductDetail}
       />
     </div>
   );
