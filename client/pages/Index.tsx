@@ -388,9 +388,12 @@ export default function Index() {
                 <p className="text-spice-light hover:text-white cursor-pointer">
                   Returns
                 </p>
-                <p className="text-spice-light hover:text-white cursor-pointer">
+                <a
+                  href="/faq"
+                  className="text-spice-light hover:text-white cursor-pointer"
+                >
                   FAQ
-                </p>
+                </a>
                 <p className="text-spice-light hover:text-white cursor-pointer">
                   Support
                 </p>
