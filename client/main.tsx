@@ -16,7 +16,6 @@ import Contact from "./pages/Contact";
 import OurStory from "./pages/OurStory";
 import Cart from "./pages/Cart";
 import Auth from "./pages/Auth";
-import Account from "./pages/Account";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import FAQ from "./pages/FAQ";
@@ -41,7 +40,6 @@ const App = () => (
               <Route path="/our-story" element={<OurStory />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/account" element={<Account />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-conditions" element={<TermsConditions />} />
               <Route path="/faq" element={<FAQ />} />
