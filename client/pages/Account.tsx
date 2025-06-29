@@ -53,6 +53,7 @@ export default function Account() {
     null,
   );
   const [showAddressDialog, setShowAddressDialog] = useState(false);
+  const [showEditAddressDialog, setShowEditAddressDialog] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
 
   // Form states
@@ -131,6 +132,12 @@ export default function Account() {
     };
 
     dispatch({ type: "ADD_ADDRESS", payload: newAddress });
+    resetAddressForm();
+    setShowAddressDialog(false);
+    alert("Address added successfully!");
+  };
+
+  const resetAddressForm = () => {
     setAddressForm({
       type: "home",
       isDefault: false,
@@ -144,8 +151,59 @@ export default function Account() {
       country: "United States",
       phone: "",
     });
-    setShowAddressDialog(false);
-    alert("Address added successfully!");
+  };
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setAddressForm({
+      type: address.type,
+      isDefault: address.isDefault,
+      firstName: address.firstName,
+      lastName: address.lastName,
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2,
+      city: address.city,
+      state: address.state,
+      zipCode: address.zipCode,
+      country: address.country,
+      phone: address.phone,
+    });
+    setShowEditAddressDialog(true);
+  };
+
+  const handleUpdateAddress = () => {
+    if (
+      !addressForm.firstName ||
+      !addressForm.addressLine1 ||
+      !addressForm.city ||
+      !editingAddress
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    const updatedAddress: Partial<Address> = {
+      type: addressForm.type as "home" | "work" | "other",
+      isDefault: addressForm.isDefault || false,
+      firstName: addressForm.firstName || "",
+      lastName: addressForm.lastName || "",
+      addressLine1: addressForm.addressLine1 || "",
+      addressLine2: addressForm.addressLine2 || "",
+      city: addressForm.city || "",
+      state: addressForm.state || "",
+      zipCode: addressForm.zipCode || "",
+      country: addressForm.country || "United States",
+      phone: addressForm.phone,
+    };
+
+    dispatch({
+      type: "UPDATE_ADDRESS",
+      payload: { id: editingAddress.id, address: updatedAddress },
+    });
+    resetAddressForm();
+    setEditingAddress(null);
+    setShowEditAddressDialog(false);
+    alert("Address updated successfully!");
   };
 
   const handleAddPaymentMethod = () => {
@@ -590,6 +648,16 @@ export default function Account() {
                             }
                           />
                         </div>
+                        <Input
+                          placeholder="Phone (Optional)"
+                          value={addressForm.phone}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              phone: e.target.value,
+                            })
+                          }
+                        />
                         <div className="flex items-center space-x-2">
                           <input
                             type="checkbox"
@@ -623,6 +691,162 @@ export default function Account() {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
+
+                  {/* Edit Address Dialog */}
+                  <Dialog
+                    open={showEditAddressDialog}
+                    onOpenChange={setShowEditAddressDialog}
+                  >
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Edit Address</DialogTitle>
+                        <DialogDescription>
+                          Update your delivery address information.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Address Type</Label>
+                          <Select
+                            value={addressForm.type}
+                            onValueChange={(value) =>
+                              setAddressForm({
+                                ...addressForm,
+                                type: value as "home" | "work" | "other",
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="home">Home</SelectItem>
+                              <SelectItem value="work">Work</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Input
+                            placeholder="First Name"
+                            value={addressForm.firstName}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                firstName: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            placeholder="Last Name"
+                            value={addressForm.lastName}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                lastName: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <Input
+                          placeholder="Address Line 1"
+                          value={addressForm.addressLine1}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              addressLine1: e.target.value,
+                            })
+                          }
+                        />
+                        <Input
+                          placeholder="Address Line 2 (Optional)"
+                          value={addressForm.addressLine2}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              addressLine2: e.target.value,
+                            })
+                          }
+                        />
+                        <div className="grid grid-cols-3 gap-4">
+                          <Input
+                            placeholder="City"
+                            value={addressForm.city}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                city: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            placeholder="State"
+                            value={addressForm.state}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                state: e.target.value,
+                              })
+                            }
+                          />
+                          <Input
+                            placeholder="ZIP"
+                            value={addressForm.zipCode}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                zipCode: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                        <Input
+                          placeholder="Phone (Optional)"
+                          value={addressForm.phone}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              phone: e.target.value,
+                            })
+                          }
+                        />
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="editDefaultAddress"
+                            checked={addressForm.isDefault}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                isDefault: e.target.checked,
+                              })
+                            }
+                          />
+                          <Label htmlFor="editDefaultAddress">
+                            Set as default address
+                          </Label>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowEditAddressDialog(false);
+                            resetAddressForm();
+                            setEditingAddress(null);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleUpdateAddress}
+                          className="bg-spice-orange hover:bg-spice-orange/90"
+                        >
+                          Update Address
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardHeader>
               <CardContent>
@@ -649,7 +873,11 @@ export default function Account() {
                             )}
                           </div>
                           <div className="flex space-x-2">
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditAddress(address)}
+                            >
                               <Edit className="w-4 h-4" />
                             </Button>
                             <Button
