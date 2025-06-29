@@ -146,13 +146,7 @@ export function Header({
                 href="/contact"
                 className="text-spice-muted hover:text-spice-brown transition-colors"
               >
-                CONTACT
-              </a>
-              <a
-                href="/faq"
-                className="text-spice-muted hover:text-spice-brown transition-colors"
-              >
-                FAQ
+                Contact
               </a>
             </div>
           </nav>
