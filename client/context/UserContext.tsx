@@ -220,38 +220,68 @@ function userReducer(state: UserState, action: UserAction): UserState {
 
     case "ADD_PAYMENT_METHOD":
       if (!state.user) return state;
+      const userWithNewPayment = {
+        ...state.user,
+        paymentMethods: [...state.user.paymentMethods, action.payload],
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithNewPayment),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          paymentMethods: [...state.user.paymentMethods, action.payload],
-        },
+        user: userWithNewPayment,
       };
 
     case "UPDATE_PAYMENT_METHOD":
       if (!state.user) return state;
+      const userWithUpdatedPayment = {
+        ...state.user,
+        paymentMethods: state.user.paymentMethods.map((method) =>
+          method.id === action.payload.id
+            ? { ...method, ...action.payload.method }
+            : method,
+        ),
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithUpdatedPayment),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          paymentMethods: state.user.paymentMethods.map((method) =>
-            method.id === action.payload.id
-              ? { ...method, ...action.payload.method }
-              : method,
-          ),
-        },
+        user: userWithUpdatedPayment,
       };
 
     case "DELETE_PAYMENT_METHOD":
       if (!state.user) return state;
+      const userWithDeletedPayment = {
+        ...state.user,
+        paymentMethods: state.user.paymentMethods.filter(
+          (method) => method.id !== action.payload,
+        ),
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithDeletedPayment),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          paymentMethods: state.user.paymentMethods.filter(
-            (method) => method.id !== action.payload,
-          ),
-        },
+        user: userWithDeletedPayment,
       };
 
     default:
