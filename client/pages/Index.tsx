@@ -341,7 +341,7 @@ export default function Index() {
                   </div>
                 </div>
                 <span className="text-xl font-bold font-display">
-                  Pickle Pot
+                  The Pickle Pot
                 </span>
               </div>
               <p className="text-spice-light mb-4">

@@ -52,7 +52,7 @@ export function Header({
                 className="text-2xl font-bold text-spice-brown font-display cursor-pointer"
                 onClick={() => (window.location.href = "/")}
               >
-                Pickle Pot
+                The Pickle Pot
               </h1>
               <p className="text-xs text-spice-muted">
                 Authentic • Traditional • Fresh
