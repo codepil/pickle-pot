@@ -154,38 +154,68 @@ function userReducer(state: UserState, action: UserAction): UserState {
 
     case "ADD_ADDRESS":
       if (!state.user) return state;
+      const userWithNewAddress = {
+        ...state.user,
+        addresses: [...state.user.addresses, action.payload],
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithNewAddress),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          addresses: [...state.user.addresses, action.payload],
-        },
+        user: userWithNewAddress,
       };
 
     case "UPDATE_ADDRESS":
       if (!state.user) return state;
+      const userWithUpdatedAddress = {
+        ...state.user,
+        addresses: state.user.addresses.map((addr) =>
+          addr.id === action.payload.id
+            ? { ...addr, ...action.payload.address }
+            : addr,
+        ),
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithUpdatedAddress),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          addresses: state.user.addresses.map((addr) =>
-            addr.id === action.payload.id
-              ? { ...addr, ...action.payload.address }
-              : addr,
-          ),
-        },
+        user: userWithUpdatedAddress,
       };
 
     case "DELETE_ADDRESS":
       if (!state.user) return state;
+      const userWithDeletedAddress = {
+        ...state.user,
+        addresses: state.user.addresses.filter(
+          (addr) => addr.id !== action.payload,
+        ),
+      };
+      // Save updated user to localStorage
+      try {
+        localStorage.setItem(
+          "picklepot_user",
+          JSON.stringify(userWithDeletedAddress),
+        );
+      } catch (error) {
+        console.error("Error saving user to localStorage:", error);
+      }
       return {
         ...state,
-        user: {
-          ...state.user,
-          addresses: state.user.addresses.filter(
-            (addr) => addr.id !== action.payload,
-          ),
-        },
+        user: userWithDeletedAddress,
       };
 
     case "ADD_PAYMENT_METHOD":
