@@ -119,7 +119,14 @@ pip install -r requirements.txt
 5. Start the development server:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main:app --reload --reload-exclude venv --host 0.0.0.0 --port 8000
+```
+
+Downgrade your Python version to 3.12 or lower to use SQLAlchemy and avoid this errors if any
+```bash
+python3.12 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ## API Documentation

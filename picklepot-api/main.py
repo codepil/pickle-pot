@@ -18,6 +18,7 @@ from core.database import create_tables
 async def lifespan(app: FastAPI):
     # Startup
     create_tables()
+    print("Lifespan startup: Tables created successfully.")
     yield
     # Shutdown
     pass

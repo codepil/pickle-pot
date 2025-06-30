@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     
     # Database
-    DATABASE_URL: str = "postgresql://user:password@localhost/picklepot"
+    DATABASE_URL: str = "postgresql://postgres:bpk123@localhost:5432/picklepot"
     DATABASE_ECHO: bool = False
     
     # Redis
