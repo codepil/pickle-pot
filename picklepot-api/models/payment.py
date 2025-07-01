@@ -50,7 +50,7 @@ class Refund(Base):
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=False)
     payment_transaction_id = Column(UUID(as_uuid=True), ForeignKey("payment_transactions.id"), nullable=False)
     refund_transaction_id = Column(String(255), nullable=False)
-    amount = Column(Decimal(10,2), nullable=False)
+    amount = Column(DECIMAL(10,2), nullable=False)
     reason = Column(String(30), nullable=False)  # requested_by_customer, out_of_stock, damaged, quality_issue, wrong_item
     notes = Column(Text, nullable=True)
     status = Column(String(20), default='pending')  # pending, processing, completed, failed
