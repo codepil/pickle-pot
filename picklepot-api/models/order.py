@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Text, Decimal, Date, ForeignKey, Index
+from sqlalchemy import Column, String, Integer, DateTime, Text, Date, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
