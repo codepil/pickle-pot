@@ -25,29 +25,37 @@ async def validate_coupon(
     ).first()
 
     if not coupon:
-        return CouponValidateResponse(
-            valid=False,
+        return CouponApplicationResponse(
+            applied=False,
+            discount_amount=Decimal('0.00'),
+            new_total=request.order_total,
             message="Invalid coupon code"
         )
 
     # Check if coupon is currently valid (date range)
     now = datetime.utcnow()
     if coupon.starts_at and coupon.starts_at > now:
-        return CouponValidateResponse(
-            valid=False,
+        return CouponApplicationResponse(
+            applied=False,
+            discount_amount=Decimal('0.00'),
+            new_total=request.order_total,
             message="Coupon is not yet active"
         )
 
     if coupon.expires_at and coupon.expires_at < now:
-        return CouponValidateResponse(
-            valid=False,
+        return CouponApplicationResponse(
+            applied=False,
+            discount_amount=Decimal('0.00'),
+            new_total=request.order_total,
             message="Coupon has expired"
         )
 
     # Check usage limits
     if coupon.usage_limit and coupon.usage_count >= coupon.usage_limit:
-        return CouponValidateResponse(
-            valid=False,
+        return CouponApplicationResponse(
+            applied=False,
+            discount_amount=Decimal('0.00'),
+            new_total=request.order_total,
             message="Coupon usage limit reached"
         )
 
@@ -59,37 +67,42 @@ async def validate_coupon(
         ).count()
 
         if user_usage_count >= coupon.usage_limit_per_customer:
-            return CouponValidateResponse(
-                valid=False,
+            return CouponApplicationResponse(
+                applied=False,
+                discount_amount=Decimal('0.00'),
+                new_total=request.order_total,
                 message="You have already used this coupon"
             )
 
     # Check minimum order amount
-    if request.order_total and request.order_total < coupon.minimum_order_amount:
-        return CouponValidateResponse(
-            valid=False,
+    if request.order_total < coupon.minimum_order_amount:
+        return CouponApplicationResponse(
+            applied=False,
+            discount_amount=Decimal('0.00'),
+            new_total=request.order_total,
             message=f"Minimum order amount of ${coupon.minimum_order_amount} required"
         )
 
     # Calculate discount amount
     discount_amount = Decimal('0.00')
-    if request.order_total:
-        if coupon.type == 'fixed_amount':
-            discount_amount = coupon.value
-        elif coupon.type == 'percentage':
-            discount_amount = request.order_total * (coupon.value / 100)
+    if coupon.type == 'fixed_amount':
+        discount_amount = coupon.value
+    elif coupon.type == 'percentage':
+        discount_amount = request.order_total * (coupon.value / 100)
 
-        # Apply maximum discount limit
-        if coupon.maximum_discount_amount and discount_amount > coupon.maximum_discount_amount:
-            discount_amount = coupon.maximum_discount_amount
+    # Apply maximum discount limit
+    if coupon.maximum_discount_amount and discount_amount > coupon.maximum_discount_amount:
+        discount_amount = coupon.maximum_discount_amount
 
-        # Don't exceed order total
-        if discount_amount > request.order_total:
-            discount_amount = request.order_total
+    # Don't exceed order total
+    if discount_amount > request.order_total:
+        discount_amount = request.order_total
 
-    return CouponValidateResponse(
-        valid=True,
-        coupon=coupon,
+    new_total = request.order_total - discount_amount
+
+    return CouponApplicationResponse(
+        applied=True,
         discount_amount=discount_amount,
+        new_total=new_total,
         message="Coupon applied successfully"
     )
