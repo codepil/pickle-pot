@@ -102,44 +102,18 @@ async def get_products(
         )
     }
 
-@router.get("/{productId}")
+@router.get("/{productId}", response_model=ProductSchema)
 async def get_product(productId: str, db: Session = Depends(get_db)):
     """Get product by ID"""
-    # Placeholder implementation
-    if productId == "1":
-        return {
-            "id": "1",
-            "name": "Mango Pickle",
-            "slug": "mango-pickle",
-            "description": "Traditional spicy mango pickle made with fresh mangoes and authentic spices",
-            "shortDescription": "Spicy mango pickle",
-            "sku": "MP001",
-            "price": 12.99,
-            "compareAtPrice": 15.99,
-            "cost": 8.50,
-            "weight": 200,
-            "weightUnit": "g",
-            "trackQuantity": True,
-            "quantity": 50,
-            "lowStockThreshold": 10,
-            "isActive": True,
-            "isFeatured": True,
-            "tags": ["spicy", "traditional", "mango"],
-            "categoryId": "1",
-            "categoryName": "Pickles",
-            "brandId": None,
-            "brandName": None,
-            "images": [],
-            "variants": [],
-            "attributes": [],
-            "relatedProducts": [],
-            "averageRating": 4.5,
-            "reviewCount": 23,
-            "createdAt": "2024-01-01T00:00:00Z",
-            "updatedAt": "2024-01-01T00:00:00Z"
-        }
-    else:
-        raise HTTPException(status_code=404, detail="Product not found")
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    return product
 
 @router.get("/{productId}/variants")
 async def get_product_variants(productId: str, db: Session = Depends(get_db)):
