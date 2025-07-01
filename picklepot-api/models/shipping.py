@@ -46,14 +46,14 @@ class Shipment(Base):
     # Shipping details
     shipped_from_address = Column(Text, nullable=True)
     shipped_to_address = Column(Text, nullable=True)
-    weight = Column(Decimal(8,2), nullable=True)
-    length = Column(Decimal(8,2), nullable=True)
-    width = Column(Decimal(8,2), nullable=True)
-    height = Column(Decimal(8,2), nullable=True)
+    weight = Column(DECIMAL(8,2), nullable=True)
+    length = Column(DECIMAL(8,2), nullable=True)
+    width = Column(DECIMAL(8,2), nullable=True)
+    height = Column(DECIMAL(8,2), nullable=True)
 
     # Shipping costs
-    shipping_cost = Column(Decimal(10,2), nullable=False)
-    insurance_cost = Column(Decimal(10,2), default=0.00)
+    shipping_cost = Column(DECIMAL(10,2), nullable=False)
+    insurance_cost = Column(DECIMAL(10,2), default=0.00)
 
     shipped_at = Column(DateTime, nullable=True)
     estimated_delivery_date = Column(Date, nullable=True)
