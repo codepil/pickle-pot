@@ -45,11 +45,11 @@ class Order(Base):
     preferred_delivery_date = Column(Date, nullable=True)
 
     # Order totals
-    subtotal = Column(Decimal(10,2), nullable=False, default=0.00)
-    tax_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    shipping_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    discount_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    total_amount = Column(Decimal(10,2), nullable=False, default=0.00)
+    subtotal = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    tax_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    shipping_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    discount_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    total_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
 
     # Currency and locale
     currency = Column(String(3), default='USD')
