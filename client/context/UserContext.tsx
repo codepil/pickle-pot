@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
 import { authApi, userApi } from "@/lib/api";
+import { setAuthToken, removeAuthToken } from "@/lib/auth";
 
 interface User {
   id: string;
@@ -319,7 +320,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       // Store auth token
       if (response.token) {
-        localStorage.setItem("auth_token", response.token);
+        setAuthToken(response.token);
       }
 
       dispatch({ type: "LOGIN_SUCCESS", payload: response.user });
@@ -337,7 +338,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
       // Store auth token
       if (response.token) {
-        localStorage.setItem("auth_token", response.token);
+        setAuthToken(response.token);
       }
 
       dispatch({ type: "LOGIN_SUCCESS", payload: response.user });
@@ -354,7 +355,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       console.error("Logout error:", error);
     } finally {
       // Always clear local state and token
-      localStorage.removeItem("auth_token");
+      removeAuthToken();
       dispatch({ type: "LOGOUT" });
     }
   };

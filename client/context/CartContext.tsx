@@ -174,7 +174,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Sync cart with server
   const syncWithServer = async () => {
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = getAuthToken();
       if (!token) return; // No auth, use local cart only
 
       const serverCart = await cartApi.getCart();
@@ -191,7 +191,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Sync cart on mount if user is authenticated
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
+    const token = getAuthToken();
     if (token) {
       syncWithServer();
     }
