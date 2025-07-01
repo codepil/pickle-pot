@@ -136,38 +136,64 @@ async def get_product_reviews(
     limit: int = Query(20, ge=1, le=100)
 ):
     """Get product reviews"""
-    # Placeholder implementation
+    from models.review import ProductReview
+    from sqlalchemy import func
+
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    # Count total reviews
+    total = db.query(ProductReview).filter(ProductReview.product_id == productId).count()
+    total_pages = math.ceil(total / limit)
+
+    # Get reviews with pagination
+    reviews = (
+        db.query(ProductReview)
+        .filter(ProductReview.product_id == productId)
+        .order_by(ProductReview.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    # Calculate rating statistics
+    rating_stats = (
+        db.query(
+            func.avg(ProductReview.rating).label('avg_rating'),
+            func.count(ProductReview.id).label('total_reviews')
+        )
+        .filter(ProductReview.product_id == productId)
+        .first()
+    )
+
+    # Get rating distribution
+    rating_distribution = {}
+    for i in range(1, 6):
+        count = (
+            db.query(ProductReview)
+            .filter(ProductReview.product_id == productId, ProductReview.rating == i)
+            .count()
+        )
+        rating_distribution[str(i)] = count
+
     return {
-        "reviews": [
-            {
-                "id": "1",
-                "userId": "user1",
-                "userName": "John D.",
-                "rating": 5,
-                "title": "Excellent pickle!",
-                "content": "This mango pickle is absolutely delicious. Perfect spice level and authentic taste.",
-                "isVerifiedPurchase": True,
-                "helpfulCount": 5,
-                "createdAt": "2024-01-15T10:30:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        },
+        "reviews": reviews,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        ),
         "summary": {
-            "averageRating": 4.5,
-            "totalReviews": 23,
-            "ratingDistribution": {
-                "5": 15,
-                "4": 6,
-                "3": 2,
-                "2": 0,
-                "1": 0
-            }
+            "averageRating": float(rating_stats.avg_rating) if rating_stats.avg_rating else 0,
+            "totalReviews": rating_stats.total_reviews,
+            "ratingDistribution": rating_distribution
         }
     }
