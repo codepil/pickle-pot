@@ -8,7 +8,7 @@ from core.auth import get_current_active_user
 from models.user import User
 from models.payment import PaymentTransaction, Refund
 from models.order import Order
-from schemas.payment import PaymentTransactionCreate, PaymentTransaction as PaymentTransactionSchema, RefundRequest
+from schemas.payment import PaymentProcessRequest, PaymentTransaction as PaymentTransactionSchema, RefundRequest
 from schemas.common import MessageResponse
 
 router = APIRouter()
