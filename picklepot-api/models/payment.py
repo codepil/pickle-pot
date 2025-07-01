@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, DateTime, Text, Decimal, ForeignKey, Index
+from sqlalchemy import Column, String, DateTime, Text, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -15,8 +16,8 @@ class PaymentTransaction(Base):
     payment_method = Column(String(20), nullable=False)  # credit_card, debit_card, paypal, apple_pay, google_pay
     payment_processor = Column(String(20), nullable=False)  # stripe, paypal, square
     status = Column(String(20), nullable=False)  # pending, processing, success, failed, cancelled, refunded, partially_refunded
-    amount = Column(Decimal(10,2), nullable=False)
-    fee_amount = Column(Decimal(10,2), default=0.00)
+    amount = Column(DECIMAL(10,2), nullable=False)
+    fee_amount = Column(DECIMAL(10,2), default=0.00)
     currency = Column(String(3), default='USD')
 
     # Card information (for credit/debit cards)
