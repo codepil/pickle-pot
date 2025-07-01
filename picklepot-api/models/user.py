@@ -44,7 +44,7 @@ class Address(Base):
     __tablename__ = "user_addresses"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     type = Column(String(20), nullable=False)  # home, work, other
     is_default = Column(Boolean, default=False)
     first_name = Column(String(100), nullable=False)
@@ -67,7 +67,7 @@ class PaymentMethod(Base):
     __tablename__ = "user_payment_methods"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     stripe_payment_method_id = Column(String(255), nullable=False)
     type = Column(String(50), nullable=False)  # card, bank_account, etc.
     last4 = Column(String(4), nullable=False)
