@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import { authApi, userApi } from "@/lib/api";
 
 interface User {
   id: string;
@@ -314,51 +315,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "LOGIN_START" });
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await authApi.login({ email, password });
 
-      // Mock user data
-      const mockUser: User = {
-        id: "user-123",
-        email,
-        firstName: "John",
-        lastName: "Doe",
-        phone: "+1 (555) 123-4567",
-        dateOfBirth: "1990-01-15",
-        preferredContactMethod: "email",
-        preferredContactTime: "anytime",
-        addresses: [
-          {
-            id: "addr-1",
-            type: "home",
-            isDefault: true,
-            firstName: "John",
-            lastName: "Doe",
-            addressLine1: "123 Main Street",
-            addressLine2: "Apt 4B",
-            city: "San Jose",
-            state: "CA",
-            zipCode: "95110",
-            country: "United States",
-            phone: "+1 (555) 123-4567",
-          },
-        ],
-        paymentMethods: [
-          {
-            id: "card-1",
-            type: "credit",
-            isDefault: true,
-            cardNumber: "****1234",
-            expiryMonth: "12",
-            expiryYear: "2027",
-            cardHolderName: "John Doe",
-            brand: "visa",
-          },
-        ],
-        createdAt: "2023-01-15T00:00:00Z",
-      };
+      // Store auth token
+      if (response.token) {
+        localStorage.setItem("auth_token", response.token);
+      }
 
-      dispatch({ type: "LOGIN_SUCCESS", payload: mockUser });
+      dispatch({ type: "LOGIN_SUCCESS", payload: response.user });
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
       throw error;
@@ -369,32 +333,30 @@ export function UserProvider({ children }: { children: ReactNode }) {
     dispatch({ type: "LOGIN_START" });
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await authApi.register(userData);
 
-      const newUser: User = {
-        id: `user-${Date.now()}`,
-        email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone || "",
-        dateOfBirth: userData.dateOfBirth || "",
-        preferredContactMethod: "email",
-        preferredContactTime: "anytime",
-        addresses: [],
-        paymentMethods: [],
-        createdAt: new Date().toISOString(),
-      };
+      // Store auth token
+      if (response.token) {
+        localStorage.setItem("auth_token", response.token);
+      }
 
-      dispatch({ type: "LOGIN_SUCCESS", payload: newUser });
+      dispatch({ type: "LOGIN_SUCCESS", payload: response.user });
     } catch (error) {
       dispatch({ type: "LOGIN_FAILURE" });
       throw error;
     }
   };
 
-  const logout = () => {
-    dispatch({ type: "LOGOUT" });
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Always clear local state and token
+      localStorage.removeItem("auth_token");
+      dispatch({ type: "LOGOUT" });
+    }
   };
 
   return (

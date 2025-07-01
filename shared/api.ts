@@ -4,6 +4,9 @@
  * and/or small pure JS functions that can be used on both client and server
  */
 
+// Re-export all API types for convenience
+export * from "./api-types";
+
 /**
  * Example response type for /api/demo
  */
