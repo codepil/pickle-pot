@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
+import math
 
 from core.database import get_db
 from core.auth import get_current_active_user
 from models.user import User
-from schemas.common import MessageResponse
+from models.order import Order, OrderItem
+from schemas.order import Order as OrderSchema, OrderCreate
+from schemas.common import MessageResponse, PaginationResponse
 
 router = APIRouter()
 
@@ -18,38 +21,32 @@ async def get_orders(
     status_filter: Optional[str] = Query(None, alias="status")
 ):
     """Get user orders"""
-    # Placeholder implementation
+    query = db.query(Order).filter(Order.user_id == current_user.id)
+
+    # Apply status filter
+    if status_filter:
+        query = query.filter(Order.status == status_filter)
+
+    # Order by created date (newest first)
+    query = query.order_by(Order.created_at.desc())
+
+    # Count total
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    orders = query.offset((page - 1) * limit).limit(limit).all()
+
     return {
-        "orders": [
-            {
-                "id": "order1",
-                "orderNumber": "ORD-2024-001",
-                "userId": str(current_user.id),
-                "status": "delivered",
-                "paymentStatus": "paid",
-                "fulfillmentStatus": "fulfilled",
-                "customerEmail": current_user.email,
-                "customerPhone": current_user.phone,
-                "subtotal": 25.98,
-                "taxAmount": 2.08,
-                "shippingAmount": 5.99,
-                "discountAmount": 0,
-                "totalAmount": 34.05,
-                "currency": "USD",
-                "createdAt": "2024-01-10T10:00:00Z",
-                "confirmedAt": "2024-01-10T10:15:00Z",
-                "shippedAt": "2024-01-11T14:30:00Z",
-                "deliveredAt": "2024-01-13T16:20:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "orders": orders,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
