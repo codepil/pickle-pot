@@ -53,7 +53,7 @@ class Order(Base):
 
     # Currency and locale
     currency = Column(String(3), default='USD')
-    tax_rate = Column(Decimal(5,4), default=0.0800)  # 8% tax rate
+    tax_rate = Column(DECIMAL(5,4), default=0.0800)  # 8% tax rate
 
     # Timestamps
     confirmed_at = Column(DateTime, nullable=True)
