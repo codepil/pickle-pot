@@ -201,6 +201,259 @@ The application is built mobile-first with responsive breakpoints:
 - **Tablet**: 768px - 1024px
 - **Desktop**: 1024px+
 
+## 🧪 Testing Framework
+
+The Pickle Pot API includes a comprehensive testing framework built with **pytest** to ensure code quality, reliability, and maintainability.
+
+### Testing Architecture
+
+Our testing strategy follows three distinct layers:
+
+#### 🔧 Unit Tests (`@pytest.mark.unit`)
+
+- **Purpose**: Test individual components in isolation
+- **Speed**: Fast execution (< 1 second per test)
+- **Coverage**: Models, schemas, business logic, utility functions
+- **Dependencies**: Mock external services and database calls
+
+```bash
+# Run unit tests only
+python picklepot-api/run_tests.py --unit
+```
+
+**What we test:**
+
+- SQLAlchemy model validation and constraints
+- Pydantic schema validation and field constraints
+- Business logic calculations (pricing, tax, shipping)
+- Data transformation utilities
+- Enum validations and type safety
+
+#### 🔗 Integration Tests (`@pytest.mark.integration`)
+
+- **Purpose**: Test API endpoints and database interactions
+- **Coverage**: HTTP request/response cycles, database operations
+- **Database**: Uses isolated test database with automatic cleanup
+- **Authentication**: Tests protected endpoints with mock auth headers
+
+```bash
+# Run integration tests only
+python picklepot-api/run_tests.py --integration
+```
+
+**What we test:**
+
+- API endpoint functionality and HTTP status codes
+- Database CRUD operations with real transactions
+- Request/response schema validation
+- Authentication and authorization flows
+- Error handling and edge cases
+
+#### 🎭 End-to-End Tests (`@pytest.mark.e2e`)
+
+- **Purpose**: Test complete user scenarios and business workflows
+- **Coverage**: Multi-step processes that span multiple API calls
+- **Scope**: Real-world user journeys from start to finish
+
+```bash
+# Run end-to-end tests only
+python picklepot-api/run_tests.py --e2e
+```
+
+**User scenarios tested:**
+
+- **Complete Guest Order Flow**: Cart creation → Add products → Apply coupons → Checkout → Payment processing → Order confirmation
+- **User Registration Journey**: Account creation → Email verification → Profile setup → Address management → First order
+- **Product Discovery Flow**: Category browsing → Search → Product details → Add to cart → Wishlist management
+- **Admin Management Scenarios**: Order status updates → Inventory management → Customer service operations
+
+### Test Configuration
+
+#### Prerequisites
+
+```bash
+# Install test dependencies
+cd picklepot-api
+pip install -r requirements-test.txt
+```
+
+#### Running Tests
+
+```bash
+# Run all tests with coverage
+python run_tests.py --all --coverage
+
+# Run tests in parallel (faster execution)
+python run_tests.py --all --parallel 4
+
+# Run with verbose output
+python run_tests.py --all --verbose
+
+# Run specific test categories
+python run_tests.py --unit --integration  # Skip e2e tests
+```
+
+#### Test Database
+
+- **Engine**: SQLite for isolated testing
+- **Lifecycle**: Fresh database created/destroyed per test function
+- **Fixtures**: Pre-populated with sample data (users, products, categories)
+- **Isolation**: No test interference or data leakage
+
+### Test Structure
+
+```
+picklepot-api/tests/
+├── conftest.py                 # Test configuration and fixtures
+├── utils.py                    # Test utilities and data generators
+├── test_product_unit.py        # Product model and schema tests
+├── test_cart_unit.py           # Cart functionality tests
+├── test_cart_integration.py    # Cart API endpoint tests
+├── test_user_scenarios.py      # Complete user workflow tests
+├── run_tests.py                # Test runner script
+└── README.md                   # Testing documentation
+```
+
+### Test Data Management
+
+#### Fixtures
+
+- **sample_user**: Test user with authentication
+- **sample_product**: Product with variants and pricing
+- **sample_category**: Product category hierarchy
+- **sample_cart_session**: Shopping cart with expiration
+- **auth_headers**: Authentication headers for protected endpoints
+- **admin_headers**: Admin-level access for management endpoints
+
+#### Data Generation
+
+```python
+from tests.utils import TestDataGenerator
+
+# Generate realistic test data
+user_data = TestDataGenerator.generate_user_data()
+product_data = TestDataGenerator.generate_product_data(category_id)
+order_data = TestDataGenerator.generate_order_data()
+```
+
+### Functional Testing Examples
+
+#### Unit Test Example
+
+```python
+@pytest.mark.unit
+def test_cart_total_calculation(db_session, sample_cart_session):
+    """Test cart total calculation with tax and shipping."""
+    cart_item = CartItem(
+        cart_session_id=sample_cart_session.id,
+        product_variant_id=variant.id,
+        quantity=2
+    )
+
+    expected_subtotal = cart_item.quantity * variant.price
+    assert calculate_cart_subtotal(cart_item) == expected_subtotal
+```
+
+#### Integration Test Example
+
+```python
+@pytest.mark.integration
+def test_add_to_cart_endpoint(client, sample_product_variant):
+    """Test adding product to cart via API."""
+    session_response = client.post("/api/cart/session")
+    session_token = session_response.json()["session_token"]
+
+    response = client.post(f"/api/cart/{session_token}/items", json={
+        "product_variant_id": sample_product_variant.id,
+        "quantity": 2
+    })
+
+    assert response.status_code == 201
+    assert response.json()["quantity"] == 2
+```
+
+#### E2E Test Example
+
+```python
+@pytest.mark.e2e
+def test_complete_order_flow(client, sample_product_variant):
+    """Test complete guest checkout flow."""
+    # Step 1: Create cart session
+    cart_response = client.post("/api/cart/session")
+    session_token = cart_response.json()["session_token"]
+
+    # Step 2: Add products to cart
+    client.post(f"/api/cart/{session_token}/items", json={
+        "product_variant_id": sample_product_variant.id,
+        "quantity": 2
+    })
+
+    # Step 3: Apply promotional code
+    client.post(f"/api/cart/{session_token}/apply-coupon", json={
+        "code": "WELCOME10"
+    })
+
+    # Step 4: Calculate shipping rates
+    shipping_response = client.post(f"/api/cart/{session_token}/shipping-rates")
+
+    # Step 5: Proceed to checkout
+    checkout_response = client.post("/api/orders/checkout", json={
+        "cart_session_id": session_token,
+        # ... complete checkout data
+    })
+
+    # Step 6: Process payment
+    payment_response = client.post("/api/payments/process")
+
+    # Verify complete order was created
+    assert checkout_response.status_code == 201
+    assert payment_response.status_code == 200
+```
+
+### Coverage and Quality Metrics
+
+#### Coverage Targets
+
+- **Unit Tests**: >95% code coverage for models and business logic
+- **Integration Tests**: >90% API endpoint coverage
+- **E2E Tests**: 100% critical user journey coverage
+
+#### Quality Assurance
+
+- **Type Safety**: Full TypeScript/Python type checking
+- **Schema Validation**: Request/response schema enforcement
+- **Error Handling**: Comprehensive error scenario testing
+- **Performance**: Load testing for high-traffic scenarios
+
+### Continuous Integration
+
+Tests are designed for CI/CD integration:
+
+```yaml
+# GitHub Actions example
+- name: Run API Tests
+  run: |
+    cd picklepot-api
+    pip install -r requirements-test.txt
+    python run_tests.py --all --coverage --parallel 4
+
+- name: Upload Coverage Reports
+  uses: codecov/codecov-action@v1
+  with:
+    file: ./picklepot-api/coverage.xml
+```
+
+### Test-Driven Development
+
+Our development workflow emphasizes TDD:
+
+1. **Red**: Write failing test for new feature
+2. **Green**: Implement minimal code to pass test
+3. **Refactor**: Improve code while keeping tests green
+4. **Repeat**: Continue cycle for robust, tested code
+
+This comprehensive testing framework ensures The Pickle Pot API maintains high quality, reliability, and user satisfaction across all features and user scenarios.
+
 ## 🚀 Deployment
 
 The application is configured for deployment on:
