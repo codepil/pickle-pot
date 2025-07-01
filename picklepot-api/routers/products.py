@@ -118,35 +118,15 @@ async def get_product(productId: str, db: Session = Depends(get_db)):
 @router.get("/{productId}/variants")
 async def get_product_variants(productId: str, db: Session = Depends(get_db)):
     """Get product variants"""
-    # Placeholder implementation
-    return {
-        "variants": [
-            {
-                "id": "1",
-                "productId": productId,
-                "name": "6oz Jar",
-                "sku": "MP001-6OZ",
-                "price": 12.99,
-                "compareAtPrice": 15.99,
-                "weight": 170,
-                "quantity": 30,
-                "isDefault": True,
-                "attributes": [{"name": "Size", "value": "6oz"}]
-            },
-            {
-                "id": "2",
-                "productId": productId,
-                "name": "8oz Jar",
-                "sku": "MP001-8OZ",
-                "price": 16.99,
-                "compareAtPrice": 19.99,
-                "weight": 227,
-                "quantity": 20,
-                "isDefault": False,
-                "attributes": [{"name": "Size", "value": "8oz"}]
-            }
-        ]
-    }
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    return {"variants": product.variants}
 
 @router.get("/{productId}/reviews")
 async def get_product_reviews(
