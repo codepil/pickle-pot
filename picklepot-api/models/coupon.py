@@ -15,9 +15,9 @@ class Coupon(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     type = Column(String(20), nullable=False)  # fixed_amount, percentage, free_shipping
-    value = Column(Decimal(10,2), nullable=False)
-    minimum_order_amount = Column(Decimal(10,2), default=0.00)
-    maximum_discount_amount = Column(Decimal(10,2), nullable=True)
+    value = Column(DECIMAL(10,2), nullable=False)
+    minimum_order_amount = Column(DECIMAL(10,2), default=0.00)
+    maximum_discount_amount = Column(DECIMAL(10,2), nullable=True)
     usage_limit = Column(Integer, nullable=True)  # NULL = unlimited
     usage_count = Column(Integer, default=0)
     usage_limit_per_customer = Column(Integer, default=1)
