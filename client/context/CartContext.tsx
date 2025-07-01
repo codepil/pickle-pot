@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from "react";
 import { cartApi } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 interface CartItem {
   id: string;
