@@ -1,45 +1,83 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import Optional
+from datetime import datetime, timedelta
+from decimal import Decimal
+import uuid
 
 from core.database import get_db
 from core.auth import get_current_user
 from models.user import User
+from models.cart import CartSession, CartItem
+from models.product import Product, ProductVariant
+from schemas.cart import CartSummary, AddToCartRequest, UpdateCartItemRequest
 from schemas.common import MessageResponse
 
 router = APIRouter()
 
-@router.get("/")
+def get_or_create_cart_session(db: Session, user: Optional[User] = None, session_token: Optional[str] = None) -> CartSession:
+    """Get existing cart session or create new one"""
+    session = None
+
+    if user:
+        # For authenticated users, find by user_id
+        session = db.query(CartSession).filter(
+            CartSession.user_id == user.id,
+            CartSession.expires_at > datetime.utcnow()
+        ).first()
+    elif session_token:
+        # For guest users, find by session_token
+        session = db.query(CartSession).filter(
+            CartSession.session_token == session_token,
+            CartSession.expires_at > datetime.utcnow()
+        ).first()
+
+    if not session:
+        # Create new session
+        session = CartSession(
+            user_id=user.id if user else None,
+            session_token=session_token or str(uuid.uuid4()),
+            expires_at=datetime.utcnow() + timedelta(days=30)
+        )
+        db.add(session)
+        db.commit()
+        db.refresh(session)
+
+    return session
+
+@router.get("/", response_model=CartSummary)
 async def get_cart(
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
+    session_token: Optional[str] = None
 ):
     """Get user's cart"""
-    # Placeholder implementation
-    return {
-        "id": "cart1",
-        "userId": str(current_user.id) if current_user else None,
-        "sessionToken": "session123" if not current_user else None,
-        "items": [
-            {
-                "id": "item1",
-                "productVariantId": "1",
-                "productName": "Mango Pickle",
-                "productSlug": "mango-pickle",
-                "variantName": "6oz Jar",
-                "sku": "MP001-6OZ",
-                "price": 12.99,
-                "quantity": 2,
-                "imageUrl": "",
-                "preferredDeliveryDate": None,
-                "specialInstructions": None,
-                "addedAt": "2024-01-15T10:30:00Z"
-            }
-        ],
-        "subtotal": 25.98,
-        "itemCount": 2,
-        "updatedAt": "2024-01-15T10:30:00Z"
-    }
+    cart_session = get_or_create_cart_session(db, current_user, session_token)
+
+    # Calculate totals
+    subtotal = Decimal('0.00')
+    item_count = 0
+
+    for item in cart_session.items:
+        if item.variant and item.variant.price:
+            subtotal += item.variant.price * item.quantity
+            item_count += item.quantity
+
+    # Placeholder tax and shipping calculations
+    estimated_tax = subtotal * Decimal('0.08')  # 8% tax
+    estimated_shipping = Decimal('5.99') if subtotal < Decimal('50.00') else Decimal('0.00')
+    estimated_total = subtotal + estimated_tax + estimated_shipping
+
+    return CartSummary(
+        session_id=str(cart_session.id),
+        items=cart_session.items,
+        item_count=item_count,
+        subtotal=subtotal,
+        estimated_tax=estimated_tax,
+        estimated_shipping=estimated_shipping,
+        estimated_total=estimated_total,
+        expires_at=cart_session.expires_at
+    )
 
 @router.post("/items", status_code=status.HTTP_201_CREATED)
 async def add_to_cart(
