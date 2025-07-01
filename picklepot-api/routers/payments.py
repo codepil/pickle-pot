@@ -35,18 +35,12 @@ async def process_payment(
     # Create payment transaction record
     payment_transaction = PaymentTransaction(
         order_id=request.order_id,
-        transaction_id=request.transaction_id or f"txn_{uuid.uuid4().hex[:10]}",
+        transaction_id=f"txn_{uuid.uuid4().hex[:10]}",
         payment_method=request.payment_method,
         payment_processor=request.payment_processor,
-        status=request.status,
+        status="processing",
         amount=request.amount,
-        fee_amount=request.fee_amount,
-        currency=request.currency,
-        card_last_four=request.card_last_four,
-        card_brand=request.card_brand,
-        processor_response=request.processor_response,
-        failure_reason=request.failure_reason,
-        reference_number=request.reference_number
+        currency=request.currency
     )
 
     db.add(payment_transaction)
