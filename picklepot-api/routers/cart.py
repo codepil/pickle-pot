@@ -81,26 +81,55 @@ async def get_cart(
 
 @router.post("/items", status_code=status.HTTP_201_CREATED)
 async def add_to_cart(
-    request: dict,
+    request: AddToCartRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
+    session_token: Optional[str] = None
 ):
     """Add item to cart"""
-    # Placeholder implementation
-    return {
-        "id": "item2",
-        "productVariantId": request.get("productVariantId"),
-        "productName": "New Product",
-        "productSlug": "new-product",
-        "variantName": "Default",
-        "sku": "NP001",
-        "price": 10.99,
-        "quantity": request.get("quantity", 1),
-        "imageUrl": "",
-        "preferredDeliveryDate": request.get("preferredDeliveryDate"),
-        "specialInstructions": request.get("specialInstructions"),
-        "addedAt": "2024-01-15T11:00:00Z"
-    }
+    # Verify product variant exists
+    variant = db.query(ProductVariant).filter(
+        ProductVariant.id == request.product_variant_id,
+        ProductVariant.is_active == True
+    ).first()
+
+    if not variant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product variant not found"
+        )
+
+    cart_session = get_or_create_cart_session(db, current_user, session_token)
+
+    # Check if item already exists in cart
+    existing_item = db.query(CartItem).filter(
+        CartItem.cart_session_id == cart_session.id,
+        CartItem.product_variant_id == request.product_variant_id
+    ).first()
+
+    if existing_item:
+        # Update quantity
+        existing_item.quantity += request.quantity
+        existing_item.preferred_delivery_date = request.preferred_delivery_date
+        existing_item.special_instructions = request.special_instructions
+        existing_item.updated_at = datetime.utcnow()
+        db.commit()
+        db.refresh(existing_item)
+        return existing_item
+    else:
+        # Create new cart item
+        cart_item = CartItem(
+            cart_session_id=cart_session.id,
+            product_id=variant.product_id,
+            product_variant_id=request.product_variant_id,
+            quantity=request.quantity,
+            preferred_delivery_date=request.preferred_delivery_date,
+            special_instructions=request.special_instructions
+        )
+        db.add(cart_item)
+        db.commit()
+        db.refresh(cart_item)
+        return cart_item
 
 @router.put("/items/{itemId}")
 async def update_cart_item(
