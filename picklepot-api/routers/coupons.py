@@ -12,12 +12,11 @@ from schemas.coupon import CouponApplicationRequest, CouponApplicationResponse
 
 router = APIRouter()
 
-@router.post("/validate", response_model=CouponValidateResponse)
+@router.post("/validate", response_model=CouponApplicationResponse)
 async def validate_coupon(
-    request: CouponValidateRequest,
+    request: CouponApplicationRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user),
-    order_total: Optional[Decimal] = None
+    current_user: Optional[User] = Depends(get_current_user)
 ):
     """Validate coupon code"""
     coupon = db.query(Coupon).filter(
