@@ -15,10 +15,10 @@ class ShippingMethod(Base):
     description = Column(Text, nullable=True)
     carrier = Column(String(100), nullable=True)  # UPS, FedEx, USPS, etc.
     service_code = Column(String(50), nullable=True)  # Carrier's service code
-    base_rate = Column(Decimal(10,2), nullable=False)
-    rate_per_pound = Column(Decimal(10,2), default=0.00)
-    free_shipping_threshold = Column(Decimal(10,2), nullable=True)  # Minimum order for free shipping
-    max_weight = Column(Decimal(8,2), nullable=True)
+    base_rate = Column(DECIMAL(10,2), nullable=False)
+    rate_per_pound = Column(DECIMAL(10,2), default=0.00)
+    free_shipping_threshold = Column(DECIMAL(10,2), nullable=True)  # Minimum order for free shipping
+    max_weight = Column(DECIMAL(8,2), nullable=True)
     estimated_days_min = Column(Integer, default=1)
     estimated_days_max = Column(Integer, default=7)
     is_active = Column(Boolean, default=True)
