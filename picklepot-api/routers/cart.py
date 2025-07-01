@@ -134,42 +134,76 @@ async def add_to_cart(
 @router.put("/items/{itemId}")
 async def update_cart_item(
     itemId: str,
-    request: dict,
+    request: UpdateCartItemRequest,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
+    session_token: Optional[str] = None
 ):
     """Update cart item"""
-    # Placeholder implementation
-    return {
-        "id": itemId,
-        "productVariantId": "1",
-        "productName": "Mango Pickle",
-        "productSlug": "mango-pickle",
-        "variantName": "6oz Jar",
-        "sku": "MP001-6OZ",
-        "price": 12.99,
-        "quantity": request.get("quantity", 1),
-        "imageUrl": "",
-        "preferredDeliveryDate": request.get("preferredDeliveryDate"),
-        "specialInstructions": request.get("specialInstructions"),
-        "addedAt": "2024-01-15T10:30:00Z"
-    }
+    cart_session = get_or_create_cart_session(db, current_user, session_token)
+
+    cart_item = db.query(CartItem).filter(
+        CartItem.id == itemId,
+        CartItem.cart_session_id == cart_session.id
+    ).first()
+
+    if not cart_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cart item not found"
+        )
+
+    # Update fields
+    if request.quantity is not None:
+        cart_item.quantity = request.quantity
+    if request.preferred_delivery_date is not None:
+        cart_item.preferred_delivery_date = request.preferred_delivery_date
+    if request.special_instructions is not None:
+        cart_item.special_instructions = request.special_instructions
+
+    cart_item.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(cart_item)
+
+    return cart_item
 
 @router.delete("/items/{itemId}", response_model=MessageResponse)
 async def remove_cart_item(
     itemId: str,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
+    session_token: Optional[str] = None
 ):
     """Remove item from cart"""
-    # Placeholder implementation
+    cart_session = get_or_create_cart_session(db, current_user, session_token)
+
+    cart_item = db.query(CartItem).filter(
+        CartItem.id == itemId,
+        CartItem.cart_session_id == cart_session.id
+    ).first()
+
+    if not cart_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Cart item not found"
+        )
+
+    db.delete(cart_item)
+    db.commit()
+
     return MessageResponse(message="Item removed from cart")
 
 @router.delete("/clear", response_model=MessageResponse)
 async def clear_cart(
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user),
+    session_token: Optional[str] = None
 ):
     """Clear all items from cart"""
-    # Placeholder implementation
+    cart_session = get_or_create_cart_session(db, current_user, session_token)
+
+    # Delete all items in the cart
+    db.query(CartItem).filter(CartItem.cart_session_id == cart_session.id).delete()
+    db.commit()
+
     return MessageResponse(message="Cart cleared successfully")
