@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, Decimal, JSON, ForeignKey, Index
+from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, JSON, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -44,7 +45,7 @@ class Product(Base):
     sku = Column(String(100), unique=True, nullable=False, index=True)
     status = Column(String(20), default='active')  # active, inactive, discontinued
     featured = Column(Boolean, default=False)
-    
+
     # Pricing for different sizes
     weight_6oz = Column(Decimal(8,2), nullable=True)
     weight_8oz = Column(Decimal(8,2), nullable=True)
@@ -54,7 +55,7 @@ class Product(Base):
     compare_price_8oz = Column(Decimal(10,2), nullable=True)
     cost_price_6oz = Column(Decimal(10,2), nullable=True)
     cost_price_8oz = Column(Decimal(10,2), nullable=True)
-    
+
     # Product details
     tax_category = Column(String(50), default='standard')
     requires_shipping = Column(Boolean, default=True)
@@ -68,11 +69,11 @@ class Product(Base):
     origin_country = Column(String(100), nullable=True)
     manufacturer = Column(String(255), nullable=True)
     tags = Column(JSON, nullable=True)
-    
+
     # SEO
     seo_title = Column(String(255), nullable=True)
     seo_description = Column(Text, nullable=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
