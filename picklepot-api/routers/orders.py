@@ -49,31 +49,68 @@ async def get_orders(
         )
     }
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=OrderSchema)
 async def create_order(
-    request: dict,
+    request: OrderCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """Create new order"""
-    # Placeholder implementation
-    return {
-        "id": "order2",
-        "orderNumber": "ORD-2024-002",
-        "userId": str(current_user.id),
-        "status": "pending",
-        "paymentStatus": "pending",
-        "fulfillmentStatus": "unfulfilled",
-        "customerEmail": current_user.email,
-        "customerPhone": current_user.phone,
-        "subtotal": 25.98,
-        "taxAmount": 2.08,
-        "shippingAmount": 5.99,
-        "discountAmount": 0,
-        "totalAmount": 34.05,
-        "currency": "USD",
-        "createdAt": "2024-01-15T12:00:00Z"
-    }
+    import secrets
+    import string
+
+    # Generate order number
+    order_number = f"ORD-{datetime.now().year}-{''.join(secrets.choices(string.ascii_uppercase + string.digits, k=6))}"
+
+    # Create order
+    order = Order(
+        order_number=order_number,
+        user_id=current_user.id,
+        customer_email=request.customer_email,
+        customer_phone=request.customer_phone,
+        billing_first_name=request.billing_first_name,
+        billing_last_name=request.billing_last_name,
+        billing_address_line1=request.billing_address_line1,
+        billing_address_line2=request.billing_address_line2,
+        billing_city=request.billing_city,
+        billing_state=request.billing_state,
+        billing_zip_code=request.billing_zip_code,
+        billing_country=request.billing_country,
+        shipping_first_name=request.shipping_first_name,
+        shipping_last_name=request.shipping_last_name,
+        shipping_address_line1=request.shipping_address_line1,
+        shipping_address_line2=request.shipping_address_line2,
+        shipping_city=request.shipping_city,
+        shipping_state=request.shipping_state,
+        shipping_zip_code=request.shipping_zip_code,
+        shipping_country=request.shipping_country,
+        shipping_phone=request.shipping_phone,
+        delivery_instructions=request.delivery_instructions,
+        preferred_delivery_date=request.preferred_delivery_date,
+        subtotal=request.subtotal,
+        tax_amount=request.tax_amount,
+        shipping_amount=request.shipping_amount,
+        discount_amount=request.discount_amount,
+        total_amount=request.total_amount
+    )
+
+    db.add(order)
+    db.commit()
+    db.refresh(order)
+
+    # Add order items if provided
+    if hasattr(request, 'items') and request.items:
+        for item_data in request.items:
+            order_item = OrderItem(
+                order_id=order.id,
+                **item_data.dict()
+            )
+            db.add(order_item)
+
+    db.commit()
+    db.refresh(order)
+
+    return order
 
 @router.get("/{orderId}")
 async def get_order(
