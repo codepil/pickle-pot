@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, or_
 from typing import Optional
+import math
 
 from core.database import get_db
 from core.auth import get_current_admin_user
 from models.user import User
+from models.product import Product
+from models.order import Order
+from models.inventory import Inventory
+from schemas.common import PaginationResponse
 
 router = APIRouter()
 
@@ -17,27 +22,39 @@ async def admin_get_products(
     search: Optional[str] = Query(None)
 ):
     """Admin: Get all products"""
-    # Placeholder implementation
+    query = db.query(Product)
+
+    # Apply search filter
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                Product.name.ilike(search_term),
+                Product.sku.ilike(search_term),
+                Product.description.ilike(search_term)
+            )
+        )
+
+    # Order by created date (newest first)
+    query = query.order_by(Product.created_at.desc())
+
+    # Count total
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    products = query.offset((page - 1) * limit).limit(limit).all()
+
     return {
-        "products": [
-            {
-                "id": "1",
-                "name": "Mango Pickle",
-                "sku": "MP001",
-                "price": 12.99,
-                "quantity": 50,
-                "isActive": True,
-                "createdAt": "2024-01-01T00:00:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "products": products,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
 @router.get("/orders")
@@ -49,26 +66,32 @@ async def admin_get_orders(
     status_filter: Optional[str] = Query(None, alias="status")
 ):
     """Admin: Get all orders"""
-    # Placeholder implementation
+    query = db.query(Order)
+
+    # Apply status filter
+    if status_filter:
+        query = query.filter(Order.status == status_filter)
+
+    # Order by created date (newest first)
+    query = query.order_by(Order.created_at.desc())
+
+    # Count total
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    orders = query.offset((page - 1) * limit).limit(limit).all()
+
     return {
-        "orders": [
-            {
-                "id": "order1",
-                "orderNumber": "ORD-2024-001",
-                "customerEmail": "customer@example.com",
-                "status": "delivered",
-                "totalAmount": 34.05,
-                "createdAt": "2024-01-10T10:00:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "orders": orders,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
 @router.get("/inventory")
@@ -78,20 +101,17 @@ async def admin_get_inventory(
     lowStock: Optional[bool] = Query(None)
 ):
     """Admin: Get inventory status"""
-    # Placeholder implementation
-    return {
-        "items": [
-            {
-                "id": "1",
-                "productName": "Mango Pickle",
-                "sku": "MP001-6OZ",
-                "currentStock": 50,
-                "lowStockThreshold": 10,
-                "isLowStock": False,
-                "lastRestocked": "2024-01-01T00:00:00Z"
-            }
-        ]
-    }
+    from models.product import ProductVariant
+
+    query = db.query(Inventory).join(ProductVariant).join(Product)
+
+    # Filter for low stock if requested
+    if lowStock:
+        query = query.filter(Inventory.quantity <= Inventory.low_stock_threshold)
+
+    inventory_items = query.all()
+
+    return {"items": inventory_items}
 
 @router.get("/settings")
 async def admin_get_settings(
@@ -99,14 +119,15 @@ async def admin_get_settings(
     current_user: User = Depends(get_current_admin_user)
 ):
     """Admin: Get application settings"""
-    # Placeholder implementation
+    # In a real implementation, these would come from a settings table
+    # For now, return static settings
     return {
         "storeName": "The Pickle Pot",
         "storeEmail": "hello@thepicklepot.com",
         "currency": "USD",
         "taxRate": 0.08,
         "shippingSettings": {
-            "freeShippingThreshold": 50,
+            "freeShippingThreshold": 50.00,
             "standardShippingRate": 5.99
         }
     }

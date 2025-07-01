@@ -18,9 +18,17 @@ class Pagination(BaseModel):
     hasNext: bool
     hasPrev: bool
 
+class PaginationResponse(BaseModel):
+    page: int
+    limit: int
+    total: int
+    totalPages: int
+    hasNext: bool
+    hasPrev: bool
+
 class PaginationParams(BaseModel):
     page: int = 1
     limit: int = 20
-    
+
     class Config:
         extra = "forbid"

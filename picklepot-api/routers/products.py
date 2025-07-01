@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import and_, or_
 from typing import List, Optional
+import math
 
 from core.database import get_db
-from schemas.common import MessageResponse
+from models.product import Product, Category, ProductImage, ProductBadge
+from schemas.product import ProductListItem, Product as ProductSchema
+from schemas.common import MessageResponse, PaginationResponse
 
 router = APIRouter()
 
@@ -14,123 +18,115 @@ async def get_products(
     search: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
-    sortBy: Optional[str] = Query("createdAt"),
+    sortBy: Optional[str] = Query("created_at"),
     sortOrder: Optional[str] = Query("desc")
 ):
     """Get all products with filtering and pagination"""
-    # Placeholder implementation
+    query = db.query(Product).filter(Product.status == 'active')
+
+    # Category filter
+    if category:
+        query = query.filter(Product.category_id == category)
+
+    # Search filter
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                Product.name.ilike(search_term),
+                Product.description.ilike(search_term),
+                Product.short_description.ilike(search_term)
+            )
+        )
+
+    # Apply sorting
+    if sortBy == "name":
+        order_field = Product.name
+    elif sortBy == "price":
+        order_field = Product.price_6oz
+    elif sortBy == "featured":
+        order_field = Product.featured
+    else:
+        order_field = Product.created_at
+
+    if sortOrder.lower() == "asc":
+        query = query.order_by(order_field.asc())
+    else:
+        query = query.order_by(order_field.desc())
+
+    # Count total items
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    products = query.offset((page - 1) * limit).limit(limit).all()
+
+    # Convert to response format
+    product_items = []
+    for product in products:
+        # Get primary image
+        primary_image = None
+        for img in product.images:
+            if img.is_primary:
+                primary_image = img
+                break
+        if not primary_image and product.images:
+            primary_image = product.images[0]
+
+        product_item = ProductListItem(
+            id=str(product.id),
+            name=product.name,
+            slug=product.slug,
+            short_description=product.short_description,
+            price_6oz=product.price_6oz,
+            price_8oz=product.price_8oz,
+            compare_price_6oz=product.compare_price_6oz,
+            compare_price_8oz=product.compare_price_8oz,
+            featured=product.featured,
+            status=product.status,
+            category=product.category,
+            primary_image=primary_image,
+            badges=product.badges
+        )
+        product_items.append(product_item)
+
     return {
-        "products": [
-            {
-                "id": "1",
-                "name": "Mango Pickle",
-                "slug": "mango-pickle",
-                "description": "Traditional spicy mango pickle",
-                "shortDescription": "Spicy mango pickle",
-                "sku": "MP001",
-                "price": 12.99,
-                "compareAtPrice": 15.99,
-                "cost": 8.50,
-                "weight": 200,
-                "weightUnit": "g",
-                "trackQuantity": True,
-                "quantity": 50,
-                "lowStockThreshold": 10,
-                "isActive": True,
-                "isFeatured": True,
-                "tags": ["spicy", "traditional", "mango"],
-                "categoryId": "1",
-                "categoryName": "Pickles",
-                "brandId": None,
-                "brandName": None,
-                "images": [],
-                "variants": [],
-                "attributes": [],
-                "createdAt": "2024-01-01T00:00:00Z",
-                "updatedAt": "2024-01-01T00:00:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "products": product_items,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
-@router.get("/{productId}")
+@router.get("/{productId}", response_model=ProductSchema)
 async def get_product(productId: str, db: Session = Depends(get_db)):
     """Get product by ID"""
-    # Placeholder implementation
-    if productId == "1":
-        return {
-            "id": "1",
-            "name": "Mango Pickle",
-            "slug": "mango-pickle",
-            "description": "Traditional spicy mango pickle made with fresh mangoes and authentic spices",
-            "shortDescription": "Spicy mango pickle",
-            "sku": "MP001",
-            "price": 12.99,
-            "compareAtPrice": 15.99,
-            "cost": 8.50,
-            "weight": 200,
-            "weightUnit": "g",
-            "trackQuantity": True,
-            "quantity": 50,
-            "lowStockThreshold": 10,
-            "isActive": True,
-            "isFeatured": True,
-            "tags": ["spicy", "traditional", "mango"],
-            "categoryId": "1",
-            "categoryName": "Pickles",
-            "brandId": None,
-            "brandName": None,
-            "images": [],
-            "variants": [],
-            "attributes": [],
-            "relatedProducts": [],
-            "averageRating": 4.5,
-            "reviewCount": 23,
-            "createdAt": "2024-01-01T00:00:00Z",
-            "updatedAt": "2024-01-01T00:00:00Z"
-        }
-    else:
-        raise HTTPException(status_code=404, detail="Product not found")
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    return product
 
 @router.get("/{productId}/variants")
 async def get_product_variants(productId: str, db: Session = Depends(get_db)):
     """Get product variants"""
-    # Placeholder implementation
-    return {
-        "variants": [
-            {
-                "id": "1",
-                "productId": productId,
-                "name": "6oz Jar",
-                "sku": "MP001-6OZ",
-                "price": 12.99,
-                "compareAtPrice": 15.99,
-                "weight": 170,
-                "quantity": 30,
-                "isDefault": True,
-                "attributes": [{"name": "Size", "value": "6oz"}]
-            },
-            {
-                "id": "2", 
-                "productId": productId,
-                "name": "8oz Jar",
-                "sku": "MP001-8OZ",
-                "price": 16.99,
-                "compareAtPrice": 19.99,
-                "weight": 227,
-                "quantity": 20,
-                "isDefault": False,
-                "attributes": [{"name": "Size", "value": "8oz"}]
-            }
-        ]
-    }
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    return {"variants": product.variants}
 
 @router.get("/{productId}/reviews")
 async def get_product_reviews(
@@ -140,38 +136,64 @@ async def get_product_reviews(
     limit: int = Query(20, ge=1, le=100)
 ):
     """Get product reviews"""
-    # Placeholder implementation
+    from models.review import ProductReview
+    from sqlalchemy import func
+
+    product = db.query(Product).filter(Product.id == productId).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    # Count total reviews
+    total = db.query(ProductReview).filter(ProductReview.product_id == productId).count()
+    total_pages = math.ceil(total / limit)
+
+    # Get reviews with pagination
+    reviews = (
+        db.query(ProductReview)
+        .filter(ProductReview.product_id == productId)
+        .order_by(ProductReview.created_at.desc())
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    # Calculate rating statistics
+    rating_stats = (
+        db.query(
+            func.avg(ProductReview.rating).label('avg_rating'),
+            func.count(ProductReview.id).label('total_reviews')
+        )
+        .filter(ProductReview.product_id == productId)
+        .first()
+    )
+
+    # Get rating distribution
+    rating_distribution = {}
+    for i in range(1, 6):
+        count = (
+            db.query(ProductReview)
+            .filter(ProductReview.product_id == productId, ProductReview.rating == i)
+            .count()
+        )
+        rating_distribution[str(i)] = count
+
     return {
-        "reviews": [
-            {
-                "id": "1",
-                "userId": "user1",
-                "userName": "John D.",
-                "rating": 5,
-                "title": "Excellent pickle!",
-                "content": "This mango pickle is absolutely delicious. Perfect spice level and authentic taste.",
-                "isVerifiedPurchase": True,
-                "helpfulCount": 5,
-                "createdAt": "2024-01-15T10:30:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        },
+        "reviews": reviews,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        ),
         "summary": {
-            "averageRating": 4.5,
-            "totalReviews": 23,
-            "ratingDistribution": {
-                "5": 15,
-                "4": 6,
-                "3": 2,
-                "2": 0,
-                "1": 0
-            }
+            "averageRating": float(rating_stats.avg_rating) if rating_stats.avg_rating else 0,
+            "totalReviews": rating_stats.total_reviews,
+            "ratingDistribution": rating_distribution
         }
     }

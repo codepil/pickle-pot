@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
+import math
+from datetime import datetime
 
 from core.database import get_db
 from core.auth import get_current_active_user
 from models.user import User
-from schemas.common import MessageResponse
+from models.order import Order, OrderItem
+from schemas.order import Order as OrderSchema, OrderCreate
+from schemas.common import MessageResponse, PaginationResponse
 
 router = APIRouter()
 
@@ -18,127 +22,116 @@ async def get_orders(
     status_filter: Optional[str] = Query(None, alias="status")
 ):
     """Get user orders"""
-    # Placeholder implementation
+    query = db.query(Order).filter(Order.user_id == current_user.id)
+
+    # Apply status filter
+    if status_filter:
+        query = query.filter(Order.status == status_filter)
+
+    # Order by created date (newest first)
+    query = query.order_by(Order.created_at.desc())
+
+    # Count total
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    orders = query.offset((page - 1) * limit).limit(limit).all()
+
     return {
-        "orders": [
-            {
-                "id": "order1",
-                "orderNumber": "ORD-2024-001",
-                "userId": str(current_user.id),
-                "status": "delivered",
-                "paymentStatus": "paid",
-                "fulfillmentStatus": "fulfilled",
-                "customerEmail": current_user.email,
-                "customerPhone": current_user.phone,
-                "subtotal": 25.98,
-                "taxAmount": 2.08,
-                "shippingAmount": 5.99,
-                "discountAmount": 0,
-                "totalAmount": 34.05,
-                "currency": "USD",
-                "createdAt": "2024-01-10T10:00:00Z",
-                "confirmedAt": "2024-01-10T10:15:00Z",
-                "shippedAt": "2024-01-11T14:30:00Z",
-                "deliveredAt": "2024-01-13T16:20:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "orders": orders,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=OrderSchema)
 async def create_order(
-    request: dict,
+    request: OrderCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """Create new order"""
-    # Placeholder implementation
-    return {
-        "id": "order2",
-        "orderNumber": "ORD-2024-002",
-        "userId": str(current_user.id),
-        "status": "pending",
-        "paymentStatus": "pending",
-        "fulfillmentStatus": "unfulfilled",
-        "customerEmail": current_user.email,
-        "customerPhone": current_user.phone,
-        "subtotal": 25.98,
-        "taxAmount": 2.08,
-        "shippingAmount": 5.99,
-        "discountAmount": 0,
-        "totalAmount": 34.05,
-        "currency": "USD",
-        "createdAt": "2024-01-15T12:00:00Z"
-    }
+    import secrets
+    import string
 
-@router.get("/{orderId}")
+    # Generate order number
+    order_number = f"ORD-{datetime.now().year}-{''.join(secrets.choices(string.ascii_uppercase + string.digits, k=6))}"
+
+    # Create order
+    order = Order(
+        order_number=order_number,
+        user_id=current_user.id,
+        customer_email=request.customer_email,
+        customer_phone=request.customer_phone,
+        billing_first_name=request.billing_first_name,
+        billing_last_name=request.billing_last_name,
+        billing_address_line1=request.billing_address_line1,
+        billing_address_line2=request.billing_address_line2,
+        billing_city=request.billing_city,
+        billing_state=request.billing_state,
+        billing_zip_code=request.billing_zip_code,
+        billing_country=request.billing_country,
+        shipping_first_name=request.shipping_first_name,
+        shipping_last_name=request.shipping_last_name,
+        shipping_address_line1=request.shipping_address_line1,
+        shipping_address_line2=request.shipping_address_line2,
+        shipping_city=request.shipping_city,
+        shipping_state=request.shipping_state,
+        shipping_zip_code=request.shipping_zip_code,
+        shipping_country=request.shipping_country,
+        shipping_phone=request.shipping_phone,
+        delivery_instructions=request.delivery_instructions,
+        preferred_delivery_date=request.preferred_delivery_date,
+        subtotal=request.subtotal,
+        tax_amount=request.tax_amount,
+        shipping_amount=request.shipping_amount,
+        discount_amount=request.discount_amount,
+        total_amount=request.total_amount
+    )
+
+    db.add(order)
+    db.commit()
+    db.refresh(order)
+
+    # Add order items if provided
+    if hasattr(request, 'items') and request.items:
+        for item_data in request.items:
+            order_item = OrderItem(
+                order_id=order.id,
+                **item_data.dict()
+            )
+            db.add(order_item)
+
+    db.commit()
+    db.refresh(order)
+
+    return order
+
+@router.get("/{orderId}", response_model=OrderSchema)
 async def get_order(
     orderId: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """Get order details"""
-    # Placeholder implementation
-    return {
-        "id": orderId,
-        "orderNumber": "ORD-2024-001",
-        "userId": str(current_user.id),
-        "status": "delivered",
-        "paymentStatus": "paid",
-        "fulfillmentStatus": "fulfilled",
-        "customerEmail": current_user.email,
-        "customerPhone": current_user.phone,
-        "subtotal": 25.98,
-        "taxAmount": 2.08,
-        "shippingAmount": 5.99,
-        "discountAmount": 0,
-        "totalAmount": 34.05,
-        "currency": "USD",
-        "items": [
-            {
-                "id": "item1",
-                "productVariantId": "1",
-                "productName": "Mango Pickle",
-                "productSku": "MP001-6OZ",
-                "variantName": "6oz Jar",
-                "quantity": 2,
-                "unitPrice": 12.99,
-                "totalPrice": 25.98,
-                "productWeight": 170,
-                "productImageUrl": ""
-            }
-        ],
-        "timeline": [
-            {
-                "event": "Order placed",
-                "description": "Order has been successfully placed",
-                "timestamp": "2024-01-10T10:00:00Z"
-            },
-            {
-                "event": "Order confirmed",
-                "description": "Order has been confirmed and is being prepared",
-                "timestamp": "2024-01-10T10:15:00Z"
-            },
-            {
-                "event": "Order shipped",
-                "description": "Order has been shipped",
-                "timestamp": "2024-01-11T14:30:00Z"
-            },
-            {
-                "event": "Order delivered",
-                "description": "Order has been delivered",
-                "timestamp": "2024-01-13T16:20:00Z"
-            }
-        ],
-        "createdAt": "2024-01-10T10:00:00Z"
-    }
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    return order
 
 @router.post("/{orderId}/cancel", response_model=MessageResponse)
 async def cancel_order(
@@ -147,7 +140,29 @@ async def cancel_order(
     current_user: User = Depends(get_current_active_user)
 ):
     """Cancel order"""
-    # Placeholder implementation
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    # Check if order can be cancelled
+    if order.status in ['shipped', 'delivered', 'cancelled']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order cannot be cancelled in current status"
+        )
+
+    # Update order status
+    order.status = 'cancelled'
+    order.cancelled_at = datetime.utcnow()
+    db.commit()
+
     return MessageResponse(message="Order cancelled successfully")
 
 @router.get("/{orderId}/tracking")
@@ -157,29 +172,36 @@ async def get_order_tracking(
     current_user: User = Depends(get_current_active_user)
 ):
     """Get order tracking information"""
-    # Placeholder implementation
+    from models.shipping import Shipment
+
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    # Get shipment information
+    shipment = db.query(Shipment).filter(Shipment.order_id == orderId).first()
+
+    if not shipment:
+        return {
+            "orderId": orderId,
+            "status": "not_shipped",
+            "message": "Order has not been shipped yet"
+        }
+
     return {
         "orderId": orderId,
-        "trackingNumber": "1Z999AA1234567890",
-        "carrier": "UPS",
-        "status": "delivered",
-        "estimatedDelivery": "2024-01-13",
-        "trackingUrl": "https://www.ups.com/track?loc=en_US&tracknum=1Z999AA1234567890",
-        "events": [
-            {
-                "event": "Package delivered",
-                "location": "Front door",
-                "timestamp": "2024-01-13T16:20:00Z"
-            },
-            {
-                "event": "Out for delivery",
-                "location": "Local facility",
-                "timestamp": "2024-01-13T08:00:00Z"
-            },
-            {
-                "event": "In transit",
-                "location": "Distribution center",
-                "timestamp": "2024-01-12T10:30:00Z"
-            }
-        ]
+        "trackingNumber": shipment.tracking_number,
+        "carrier": shipment.carrier,
+        "status": shipment.status,
+        "estimatedDelivery": shipment.estimated_delivery_date,
+        "trackingUrl": shipment.tracking_url,
+        "shippedAt": shipment.shipped_at,
+        "deliveredAt": shipment.delivered_at
     }

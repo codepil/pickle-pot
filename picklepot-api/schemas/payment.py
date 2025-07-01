@@ -102,6 +102,14 @@ class Refund(RefundBase):
     class Config:
         from_attributes = True
 
+# Payment Process Request (simplified for API usage)
+class PaymentProcessRequest(BaseModel):
+    order_id: str
+    amount: Decimal = Field(..., ge=0, decimal_places=2)
+    payment_method: PaymentMethod
+    payment_processor: PaymentProcessor = PaymentProcessor.stripe
+    currency: str = Field("USD", max_length=3)
+
 # Payment Intent (for Stripe integration)
 class PaymentIntentCreate(BaseModel):
     order_id: str
