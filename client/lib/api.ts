@@ -3,6 +3,8 @@
  * Handles all HTTP requests to the backend API at localhost:8000
  */
 
+import { getAuthToken } from "./auth";
+
 const API_BASE_URL = "/api";
 
 interface ApiResponse<T> {
@@ -35,8 +37,8 @@ async function apiRequest<T>(
     "Content-Type": "application/json",
   };
 
-  // Get auth token from localStorage if available
-  const token = localStorage.getItem("auth_token");
+  // Get auth token using auth utility
+  const token = getAuthToken();
   if (token) {
     defaultHeaders["Authorization"] = `Bearer ${token}`;
   }
