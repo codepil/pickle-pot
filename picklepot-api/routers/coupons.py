@@ -8,7 +8,7 @@ from core.database import get_db
 from core.auth import get_current_user
 from models.user import User
 from models.coupon import Coupon, CouponUsage
-from schemas.coupon import CouponValidateRequest, CouponValidateResponse
+from schemas.coupon import CouponApplicationRequest, CouponApplicationResponse
 
 router = APIRouter()
 
