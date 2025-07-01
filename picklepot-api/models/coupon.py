@@ -43,7 +43,7 @@ class CouponUsage(Base):
     coupon_id = Column(UUID(as_uuid=True), ForeignKey("coupons.id"), nullable=False)
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
-    discount_amount = Column(Decimal(10,2), nullable=False)
+    discount_amount = Column(DECIMAL(10,2), nullable=False)
     used_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
