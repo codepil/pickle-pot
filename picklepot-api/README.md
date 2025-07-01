@@ -131,6 +131,8 @@ pip install -r requirements.txt
 
 ## API Documentation
 
+http://localhost:8000/docs#
+
 ### Authentication
 
 All protected endpoints require a Bearer token in the Authorization header:
