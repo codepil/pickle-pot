@@ -66,26 +66,32 @@ async def admin_get_orders(
     status_filter: Optional[str] = Query(None, alias="status")
 ):
     """Admin: Get all orders"""
-    # Placeholder implementation
+    query = db.query(Order)
+
+    # Apply status filter
+    if status_filter:
+        query = query.filter(Order.status == status_filter)
+
+    # Order by created date (newest first)
+    query = query.order_by(Order.created_at.desc())
+
+    # Count total
+    total = query.count()
+    total_pages = math.ceil(total / limit)
+
+    # Apply pagination
+    orders = query.offset((page - 1) * limit).limit(limit).all()
+
     return {
-        "orders": [
-            {
-                "id": "order1",
-                "orderNumber": "ORD-2024-001",
-                "customerEmail": "customer@example.com",
-                "status": "delivered",
-                "totalAmount": 34.05,
-                "createdAt": "2024-01-10T10:00:00Z"
-            }
-        ],
-        "pagination": {
-            "page": 1,
-            "limit": 20,
-            "total": 1,
-            "totalPages": 1,
-            "hasNext": False,
-            "hasPrev": False
-        }
+        "orders": orders,
+        "pagination": PaginationResponse(
+            page=page,
+            limit=limit,
+            total=total,
+            totalPages=total_pages,
+            hasNext=page < total_pages,
+            hasPrev=page > 1
+        )
     }
 
 @router.get("/inventory")
