@@ -91,11 +91,11 @@ class OrderItem(Base):
     product_sku = Column(String(100), nullable=False)
     variant_name = Column(String(255), nullable=False)
     quantity = Column(Integer, nullable=False)
-    unit_price = Column(Decimal(10,2), nullable=False)
-    total_price = Column(Decimal(10,2), nullable=False)
+    unit_price = Column(DECIMAL(10,2), nullable=False)
+    total_price = Column(DECIMAL(10,2), nullable=False)
 
     # Product snapshot data
-    product_weight = Column(Decimal(8,2), nullable=True)
+    product_weight = Column(DECIMAL(8,2), nullable=True)
     product_image_url = Column(String(500), nullable=True)
 
     # Relationships
