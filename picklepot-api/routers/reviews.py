@@ -5,7 +5,7 @@ from core.database import get_db
 from core.auth import get_current_active_user
 from models.user import User
 from models.review import ProductReview
-from models.product import Product
+from models.product import Product, ProductVariant
 from models.order import Order, OrderItem
 from schemas.review import ProductReviewCreate, ProductReview as ProductReviewSchema
 
