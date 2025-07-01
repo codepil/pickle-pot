@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Text, Decimal, Boolean, Date, ForeignKey, Index
+from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean, Date, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -14,10 +15,10 @@ class ShippingMethod(Base):
     description = Column(Text, nullable=True)
     carrier = Column(String(100), nullable=True)  # UPS, FedEx, USPS, etc.
     service_code = Column(String(50), nullable=True)  # Carrier's service code
-    base_rate = Column(Decimal(10,2), nullable=False)
-    rate_per_pound = Column(Decimal(10,2), default=0.00)
-    free_shipping_threshold = Column(Decimal(10,2), nullable=True)  # Minimum order for free shipping
-    max_weight = Column(Decimal(8,2), nullable=True)
+    base_rate = Column(DECIMAL(10,2), nullable=False)
+    rate_per_pound = Column(DECIMAL(10,2), default=0.00)
+    free_shipping_threshold = Column(DECIMAL(10,2), nullable=True)  # Minimum order for free shipping
+    max_weight = Column(DECIMAL(8,2), nullable=True)
     estimated_days_min = Column(Integer, default=1)
     estimated_days_max = Column(Integer, default=7)
     is_active = Column(Boolean, default=True)
@@ -45,14 +46,14 @@ class Shipment(Base):
     # Shipping details
     shipped_from_address = Column(Text, nullable=True)
     shipped_to_address = Column(Text, nullable=True)
-    weight = Column(Decimal(8,2), nullable=True)
-    length = Column(Decimal(8,2), nullable=True)
-    width = Column(Decimal(8,2), nullable=True)
-    height = Column(Decimal(8,2), nullable=True)
+    weight = Column(DECIMAL(8,2), nullable=True)
+    length = Column(DECIMAL(8,2), nullable=True)
+    width = Column(DECIMAL(8,2), nullable=True)
+    height = Column(DECIMAL(8,2), nullable=True)
 
     # Shipping costs
-    shipping_cost = Column(Decimal(10,2), nullable=False)
-    insurance_cost = Column(Decimal(10,2), default=0.00)
+    shipping_cost = Column(DECIMAL(10,2), nullable=False)
+    insurance_cost = Column(DECIMAL(10,2), default=0.00)
 
     shipped_at = Column(DateTime, nullable=True)
     estimated_delivery_date = Column(Date, nullable=True)

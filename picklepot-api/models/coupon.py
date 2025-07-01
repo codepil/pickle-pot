@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Text, Decimal, Boolean, ForeignKey, Index
+from sqlalchemy import Column, String, Integer, DateTime, Text, Boolean, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -14,9 +15,9 @@ class Coupon(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     type = Column(String(20), nullable=False)  # fixed_amount, percentage, free_shipping
-    value = Column(Decimal(10,2), nullable=False)
-    minimum_order_amount = Column(Decimal(10,2), default=0.00)
-    maximum_discount_amount = Column(Decimal(10,2), nullable=True)
+    value = Column(DECIMAL(10,2), nullable=False)
+    minimum_order_amount = Column(DECIMAL(10,2), default=0.00)
+    maximum_discount_amount = Column(DECIMAL(10,2), nullable=True)
     usage_limit = Column(Integer, nullable=True)  # NULL = unlimited
     usage_count = Column(Integer, default=0)
     usage_limit_per_customer = Column(Integer, default=1)
@@ -42,7 +43,7 @@ class CouponUsage(Base):
     coupon_id = Column(UUID(as_uuid=True), ForeignKey("coupons.id"), nullable=False)
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
-    discount_amount = Column(Decimal(10,2), nullable=False)
+    discount_amount = Column(DECIMAL(10,2), nullable=False)
     used_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Text, Decimal, Date, ForeignKey, Index
+from sqlalchemy import Column, String, Integer, DateTime, Text, Date, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -44,15 +45,15 @@ class Order(Base):
     preferred_delivery_date = Column(Date, nullable=True)
 
     # Order totals
-    subtotal = Column(Decimal(10,2), nullable=False, default=0.00)
-    tax_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    shipping_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    discount_amount = Column(Decimal(10,2), nullable=False, default=0.00)
-    total_amount = Column(Decimal(10,2), nullable=False, default=0.00)
+    subtotal = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    tax_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    shipping_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    discount_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
+    total_amount = Column(DECIMAL(10,2), nullable=False, default=0.00)
 
     # Currency and locale
     currency = Column(String(3), default='USD')
-    tax_rate = Column(Decimal(5,4), default=0.0800)  # 8% tax rate
+    tax_rate = Column(DECIMAL(5,4), default=0.0800)  # 8% tax rate
 
     # Timestamps
     confirmed_at = Column(DateTime, nullable=True)
@@ -90,11 +91,11 @@ class OrderItem(Base):
     product_sku = Column(String(100), nullable=False)
     variant_name = Column(String(255), nullable=False)
     quantity = Column(Integer, nullable=False)
-    unit_price = Column(Decimal(10,2), nullable=False)
-    total_price = Column(Decimal(10,2), nullable=False)
+    unit_price = Column(DECIMAL(10,2), nullable=False)
+    total_price = Column(DECIMAL(10,2), nullable=False)
 
     # Product snapshot data
-    product_weight = Column(Decimal(8,2), nullable=True)
+    product_weight = Column(DECIMAL(8,2), nullable=True)
     product_image_url = Column(String(500), nullable=True)
 
     # Relationships

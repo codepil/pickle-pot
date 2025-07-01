@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Text, Decimal, ForeignKey, Index
+from sqlalchemy import Column, String, Integer, DateTime, Text, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -39,7 +40,7 @@ class InventoryMovement(Base):
     quantity = Column(Integer, nullable=False)  # Positive for stock in, negative for stock out
     reference_type = Column(String(20), nullable=True)  # order, adjustment, purchase_order, return
     reference_id = Column(UUID(as_uuid=True), nullable=True)
-    cost_per_unit = Column(Decimal(10,2), nullable=True)
+    cost_per_unit = Column(DECIMAL(10,2), nullable=True)
     notes = Column(Text, nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, Decimal, JSON, ForeignKey, Index
+from sqlalchemy import Column, String, Boolean, DateTime, Text, Integer, JSON, ForeignKey, Index
+from sqlalchemy.types import DECIMAL
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -44,22 +45,22 @@ class Product(Base):
     sku = Column(String(100), unique=True, nullable=False, index=True)
     status = Column(String(20), default='active')  # active, inactive, discontinued
     featured = Column(Boolean, default=False)
-    
+
     # Pricing for different sizes
-    weight_6oz = Column(Decimal(8,2), nullable=True)
-    weight_8oz = Column(Decimal(8,2), nullable=True)
-    price_6oz = Column(Decimal(10,2), nullable=True)
-    price_8oz = Column(Decimal(10,2), nullable=True)
-    compare_price_6oz = Column(Decimal(10,2), nullable=True)
-    compare_price_8oz = Column(Decimal(10,2), nullable=True)
-    cost_price_6oz = Column(Decimal(10,2), nullable=True)
-    cost_price_8oz = Column(Decimal(10,2), nullable=True)
-    
+    weight_6oz = Column(DECIMAL(8,2), nullable=True)
+    weight_8oz = Column(DECIMAL(8,2), nullable=True)
+    price_6oz = Column(DECIMAL(10,2), nullable=True)
+    price_8oz = Column(DECIMAL(10,2), nullable=True)
+    compare_price_6oz = Column(DECIMAL(10,2), nullable=True)
+    compare_price_8oz = Column(DECIMAL(10,2), nullable=True)
+    cost_price_6oz = Column(DECIMAL(10,2), nullable=True)
+    cost_price_8oz = Column(DECIMAL(10,2), nullable=True)
+
     # Product details
     tax_category = Column(String(50), default='standard')
     requires_shipping = Column(Boolean, default=True)
-    shipping_weight_6oz = Column(Decimal(8,2), nullable=True)
-    shipping_weight_8oz = Column(Decimal(8,2), nullable=True)
+    shipping_weight_6oz = Column(DECIMAL(8,2), nullable=True)
+    shipping_weight_8oz = Column(DECIMAL(8,2), nullable=True)
     ingredients = Column(Text, nullable=True)
     allergen_info = Column(Text, nullable=True)
     nutritional_info = Column(JSON, nullable=True)
@@ -68,11 +69,11 @@ class Product(Base):
     origin_country = Column(String(100), nullable=True)
     manufacturer = Column(String(255), nullable=True)
     tags = Column(JSON, nullable=True)
-    
+
     # SEO
     seo_title = Column(String(255), nullable=True)
     seo_description = Column(Text, nullable=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -120,11 +121,11 @@ class ProductVariant(Base):
     name = Column(String(255), nullable=False)  # e.g., "6oz Bottle", "8oz Bottle"
     sku = Column(String(100), unique=True, nullable=False, index=True)
     size = Column(String(50), nullable=False)  # "6oz", "8oz"
-    price = Column(Decimal(10,2), nullable=False)
-    compare_price = Column(Decimal(10,2), nullable=True)
-    cost_price = Column(Decimal(10,2), nullable=True)
-    weight = Column(Decimal(8,2), nullable=True)
-    shipping_weight = Column(Decimal(8,2), nullable=True)
+    price = Column(DECIMAL(10,2), nullable=False)
+    compare_price = Column(DECIMAL(10,2), nullable=True)
+    cost_price = Column(DECIMAL(10,2), nullable=True)
+    weight = Column(DECIMAL(8,2), nullable=True)
+    shipping_weight = Column(DECIMAL(8,2), nullable=True)
     barcode = Column(String(100), nullable=True)
     track_inventory = Column(Boolean, default=True)
     inventory_policy = Column(String(20), default='deny')  # deny, continue
