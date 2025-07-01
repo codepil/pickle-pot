@@ -121,11 +121,11 @@ class ProductVariant(Base):
     name = Column(String(255), nullable=False)  # e.g., "6oz Bottle", "8oz Bottle"
     sku = Column(String(100), unique=True, nullable=False, index=True)
     size = Column(String(50), nullable=False)  # "6oz", "8oz"
-    price = Column(Decimal(10,2), nullable=False)
-    compare_price = Column(Decimal(10,2), nullable=True)
-    cost_price = Column(Decimal(10,2), nullable=True)
-    weight = Column(Decimal(8,2), nullable=True)
-    shipping_weight = Column(Decimal(8,2), nullable=True)
+    price = Column(DECIMAL(10,2), nullable=False)
+    compare_price = Column(DECIMAL(10,2), nullable=True)
+    cost_price = Column(DECIMAL(10,2), nullable=True)
+    weight = Column(DECIMAL(8,2), nullable=True)
+    shipping_weight = Column(DECIMAL(8,2), nullable=True)
     barcode = Column(String(100), nullable=True)
     track_inventory = Column(Boolean, default=True)
     inventory_policy = Column(String(20), default='deny')  # deny, continue
