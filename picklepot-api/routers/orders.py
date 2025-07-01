@@ -139,7 +139,29 @@ async def cancel_order(
     current_user: User = Depends(get_current_active_user)
 ):
     """Cancel order"""
-    # Placeholder implementation
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    # Check if order can be cancelled
+    if order.status in ['shipped', 'delivered', 'cancelled']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order cannot be cancelled in current status"
+        )
+
+    # Update order status
+    order.status = 'cancelled'
+    order.cancelled_at = datetime.utcnow()
+    db.commit()
+
     return MessageResponse(message="Order cancelled successfully")
 
 @router.get("/{orderId}/tracking")
@@ -149,29 +171,36 @@ async def get_order_tracking(
     current_user: User = Depends(get_current_active_user)
 ):
     """Get order tracking information"""
-    # Placeholder implementation
+    from models.shipping import Shipment
+
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    # Get shipment information
+    shipment = db.query(Shipment).filter(Shipment.order_id == orderId).first()
+
+    if not shipment:
+        return {
+            "orderId": orderId,
+            "status": "not_shipped",
+            "message": "Order has not been shipped yet"
+        }
+
     return {
         "orderId": orderId,
-        "trackingNumber": "1Z999AA1234567890",
-        "carrier": "UPS",
-        "status": "delivered",
-        "estimatedDelivery": "2024-01-13",
-        "trackingUrl": "https://www.ups.com/track?loc=en_US&tracknum=1Z999AA1234567890",
-        "events": [
-            {
-                "event": "Package delivered",
-                "location": "Front door",
-                "timestamp": "2024-01-13T16:20:00Z"
-            },
-            {
-                "event": "Out for delivery",
-                "location": "Local facility",
-                "timestamp": "2024-01-13T08:00:00Z"
-            },
-            {
-                "event": "In transit",
-                "location": "Distribution center",
-                "timestamp": "2024-01-12T10:30:00Z"
-            }
-        ]
+        "trackingNumber": shipment.tracking_number,
+        "carrier": shipment.carrier,
+        "status": shipment.status,
+        "estimatedDelivery": shipment.estimated_delivery_date,
+        "trackingUrl": shipment.tracking_url,
+        "shippedAt": shipment.shipped_at,
+        "deliveredAt": shipment.delivered_at
     }
