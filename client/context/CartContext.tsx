@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  ReactNode,
+  useEffect,
+} from "react";
+import { cartApi } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 interface CartItem {
   id: string;
@@ -23,7 +31,8 @@ type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
-  | { type: "CLEAR_CART" };
+  | { type: "CLEAR_CART" }
+  | { type: "SYNC_WITH_SERVER"; payload: any };
 
 const initialState: CartState = {
   items: [],
@@ -34,6 +43,7 @@ const initialState: CartState = {
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
+  syncWithServer: () => Promise<void>;
 } | null>(null);
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -121,6 +131,39 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "CLEAR_CART":
       return initialState;
 
+    case "SYNC_WITH_SERVER": {
+      // Convert server cart format to local cart format
+      const serverCart = action.payload;
+      const convertedItems: CartItem[] =
+        serverCart.items?.map((item: any) => ({
+          id: item.id,
+          name: item.product.name,
+          price: item.price,
+          originalPrice: item.variant.originalPrice,
+          image: item.product.images?.[0]?.url || "/placeholder.svg",
+          size: item.variant.size,
+          quantity: item.quantity,
+          category: item.product.category.name.toLowerCase().includes("pickle")
+            ? "pickle"
+            : "powder",
+          badge: item.product.isFeatured ? "Featured" : undefined,
+        })) || [];
+
+      const total = convertedItems.reduce((sum, item) => {
+        const price =
+          typeof item.price === "string"
+            ? parseFloat(item.price.replace("$", ""))
+            : item.price;
+        return sum + price * item.quantity;
+      }, 0);
+
+      return {
+        items: convertedItems,
+        total: Math.round(total * 100) / 100,
+        itemCount: convertedItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    }
+
     default:
       return state;
   }
@@ -129,8 +172,34 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
+  // Sync cart with server
+  const syncWithServer = async () => {
+    try {
+      const token = getAuthToken();
+      if (!token) return; // No auth, use local cart only
+
+      const serverCart = await cartApi.getCart();
+
+      // Update local state with server cart
+      if (serverCart && serverCart.items) {
+        dispatch({ type: "SYNC_WITH_SERVER", payload: serverCart });
+      }
+    } catch (error) {
+      console.error("Cart sync error:", error);
+      // Continue with local cart if server sync fails
+    }
+  };
+
+  // Sync cart on mount if user is authenticated
+  useEffect(() => {
+    const token = getAuthToken();
+    if (token) {
+      syncWithServer();
+    }
+  }, []);
+
   return (
-    <CartContext.Provider value={{ state, dispatch }}>
+    <CartContext.Provider value={{ state, dispatch, syncWithServer }}>
       {children}
     </CartContext.Provider>
   );
