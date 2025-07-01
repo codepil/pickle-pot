@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session, or_
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from typing import Optional
 import math
 
