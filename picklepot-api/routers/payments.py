@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.post("/process", response_model=PaymentTransactionSchema)
 async def process_payment(
-    request: PaymentProcessRequest,
+    request: PaymentTransactionCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
