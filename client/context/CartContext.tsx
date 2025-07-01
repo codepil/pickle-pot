@@ -130,6 +130,39 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "CLEAR_CART":
       return initialState;
 
+    case "SYNC_WITH_SERVER": {
+      // Convert server cart format to local cart format
+      const serverCart = action.payload;
+      const convertedItems: CartItem[] =
+        serverCart.items?.map((item: any) => ({
+          id: item.id,
+          name: item.product.name,
+          price: item.price,
+          originalPrice: item.variant.originalPrice,
+          image: item.product.images?.[0]?.url || "/placeholder.svg",
+          size: item.variant.size,
+          quantity: item.quantity,
+          category: item.product.category.name.toLowerCase().includes("pickle")
+            ? "pickle"
+            : "powder",
+          badge: item.product.isFeatured ? "Featured" : undefined,
+        })) || [];
+
+      const total = convertedItems.reduce((sum, item) => {
+        const price =
+          typeof item.price === "string"
+            ? parseFloat(item.price.replace("$", ""))
+            : item.price;
+        return sum + price * item.quantity;
+      }, 0);
+
+      return {
+        items: convertedItems,
+        total: Math.round(total * 100) / 100,
+        itemCount: convertedItems.reduce((sum, item) => sum + item.quantity, 0),
+      };
+    }
+
     default:
       return state;
   }
