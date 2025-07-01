@@ -101,20 +101,17 @@ async def admin_get_inventory(
     lowStock: Optional[bool] = Query(None)
 ):
     """Admin: Get inventory status"""
-    # Placeholder implementation
-    return {
-        "items": [
-            {
-                "id": "1",
-                "productName": "Mango Pickle",
-                "sku": "MP001-6OZ",
-                "currentStock": 50,
-                "lowStockThreshold": 10,
-                "isLowStock": False,
-                "lastRestocked": "2024-01-01T00:00:00Z"
-            }
-        ]
-    }
+    from models.product import ProductVariant
+
+    query = db.query(Inventory).join(ProductVariant).join(Product)
+
+    # Filter for low stock if requested
+    if lowStock:
+        query = query.filter(Inventory.quantity <= Inventory.low_stock_threshold)
+
+    inventory_items = query.all()
+
+    return {"items": inventory_items}
 
 @router.get("/settings")
 async def admin_get_settings(
@@ -122,14 +119,15 @@ async def admin_get_settings(
     current_user: User = Depends(get_current_admin_user)
 ):
     """Admin: Get application settings"""
-    # Placeholder implementation
+    # In a real implementation, these would come from a settings table
+    # For now, return static settings
     return {
         "storeName": "The Pickle Pot",
         "storeEmail": "hello@thepicklepot.com",
         "currency": "USD",
         "taxRate": 0.08,
         "shippingSettings": {
-            "freeShippingThreshold": 50,
+            "freeShippingThreshold": 50.00,
             "standardShippingRate": 5.99
         }
     }
