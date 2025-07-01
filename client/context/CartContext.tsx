@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  ReactNode,
+  useEffect,
+} from "react";
+import { cartApi } from "@/lib/api";
 
 interface CartItem {
   id: string;
@@ -23,7 +30,8 @@ type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
   | { type: "REMOVE_ITEM"; payload: string }
   | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
-  | { type: "CLEAR_CART" };
+  | { type: "CLEAR_CART" }
+  | { type: "SYNC_WITH_SERVER"; payload: any };
 
 const initialState: CartState = {
   items: [],
@@ -34,6 +42,7 @@ const initialState: CartState = {
 const CartContext = createContext<{
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
+  syncWithServer: () => Promise<void>;
 } | null>(null);
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -129,8 +138,34 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
+  // Sync cart with server
+  const syncWithServer = async () => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) return; // No auth, use local cart only
+
+      const serverCart = await cartApi.getCart();
+
+      // Update local state with server cart
+      if (serverCart && serverCart.items) {
+        dispatch({ type: "SYNC_WITH_SERVER", payload: serverCart });
+      }
+    } catch (error) {
+      console.error("Cart sync error:", error);
+      // Continue with local cart if server sync fails
+    }
+  };
+
+  // Sync cart on mount if user is authenticated
+  useEffect(() => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      syncWithServer();
+    }
+  }, []);
+
   return (
-    <CartContext.Provider value={{ state, dispatch }}>
+    <CartContext.Provider value={{ state, dispatch, syncWithServer }}>
       {children}
     </CartContext.Provider>
   );
