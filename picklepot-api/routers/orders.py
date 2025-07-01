@@ -112,67 +112,25 @@ async def create_order(
 
     return order
 
-@router.get("/{orderId}")
+@router.get("/{orderId}", response_model=OrderSchema)
 async def get_order(
     orderId: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """Get order details"""
-    # Placeholder implementation
-    return {
-        "id": orderId,
-        "orderNumber": "ORD-2024-001",
-        "userId": str(current_user.id),
-        "status": "delivered",
-        "paymentStatus": "paid",
-        "fulfillmentStatus": "fulfilled",
-        "customerEmail": current_user.email,
-        "customerPhone": current_user.phone,
-        "subtotal": 25.98,
-        "taxAmount": 2.08,
-        "shippingAmount": 5.99,
-        "discountAmount": 0,
-        "totalAmount": 34.05,
-        "currency": "USD",
-        "items": [
-            {
-                "id": "item1",
-                "productVariantId": "1",
-                "productName": "Mango Pickle",
-                "productSku": "MP001-6OZ",
-                "variantName": "6oz Jar",
-                "quantity": 2,
-                "unitPrice": 12.99,
-                "totalPrice": 25.98,
-                "productWeight": 170,
-                "productImageUrl": ""
-            }
-        ],
-        "timeline": [
-            {
-                "event": "Order placed",
-                "description": "Order has been successfully placed",
-                "timestamp": "2024-01-10T10:00:00Z"
-            },
-            {
-                "event": "Order confirmed",
-                "description": "Order has been confirmed and is being prepared",
-                "timestamp": "2024-01-10T10:15:00Z"
-            },
-            {
-                "event": "Order shipped",
-                "description": "Order has been shipped",
-                "timestamp": "2024-01-11T14:30:00Z"
-            },
-            {
-                "event": "Order delivered",
-                "description": "Order has been delivered",
-                "timestamp": "2024-01-13T16:20:00Z"
-            }
-        ],
-        "createdAt": "2024-01-10T10:00:00Z"
-    }
+    order = db.query(Order).filter(
+        Order.id == orderId,
+        Order.user_id == current_user.id
+    ).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    return order
 
 @router.post("/{orderId}/cancel", response_model=MessageResponse)
 async def cancel_order(
