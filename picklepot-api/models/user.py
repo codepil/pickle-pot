@@ -32,12 +32,16 @@ class User(Base):
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
     payment_methods = relationship("PaymentMethod", back_populates="user", cascade="all, delete-orphan")
     orders = relationship("Order", back_populates="user")
-    cart_items = relationship("CartItem", back_populates="user")
-    reviews = relationship("Review", back_populates="user")
+    cart_sessions = relationship("CartSession", back_populates="user")
+    reviews = relationship("ProductReview", back_populates="user")
     wishlist_items = relationship("WishlistItem", back_populates="user")
+    coupon_usages = relationship("CouponUsage", back_populates="user")
+    analytics_events = relationship("AnalyticsEvent", back_populates="user")
+    newsletter_subscription = relationship("NewsletterSubscription", back_populates="user", uselist=False)
+    blog_posts = relationship("BlogPost", back_populates="author")
 
 class Address(Base):
-    __tablename__ = "addresses"
+    __tablename__ = "user_addresses"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False)
@@ -60,7 +64,7 @@ class Address(Base):
     user = relationship("User", back_populates="addresses")
 
 class PaymentMethod(Base):
-    __tablename__ = "payment_methods"
+    __tablename__ = "user_payment_methods"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False)
@@ -71,7 +75,7 @@ class PaymentMethod(Base):
     expiry_month = Column(Integer, nullable=True)
     expiry_year = Column(Integer, nullable=True)
     is_default = Column(Boolean, default=False)
-    billing_address_id = Column(UUID(as_uuid=True), nullable=True)
+    billing_address_id = Column(UUID(as_uuid=True), ForeignKey("user_addresses.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
