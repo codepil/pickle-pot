@@ -42,6 +42,7 @@ import {
   Home,
   Building,
   Heart,
+  Lock,
 } from "lucide-react";
 import { useUser, Address, PaymentMethod } from "@/context/UserContext";
 
