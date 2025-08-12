@@ -264,7 +264,7 @@ export default function Account() {
               <Button
                 variant="outline"
                 className="border-spice-orange text-spice-orange"
-                onClick={() => window.history.back()}
+                onClick={() => (window.location.href = "/")}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Shop
