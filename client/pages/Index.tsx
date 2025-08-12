@@ -113,6 +113,7 @@ export default function Index() {
                   size="lg"
                   variant="outline"
                   className="border-spice-orange text-spice-orange text-lg px-8"
+                  onClick={() => (window.location.href = "/our-story")}
                 >
                   Our Story
                 </Button>
