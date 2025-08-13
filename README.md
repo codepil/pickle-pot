@@ -1,4 +1,4 @@
-# The Pickle Pot 🫙
+# The First Pickle Pot 🫙
 
 A modern e-commerce platform for authentic Indian pickles and spice powders, built with React and TypeScript.
 
